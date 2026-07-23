@@ -58,17 +58,21 @@ Der Upload läuft per **rsync über SSH** (Passwort-Auth, wie bei der
 energieteam-fehmarn-Seite). Im Repo: **Settings → Secrets and variables →
 Actions → New repository secret**. Nur die SSH-Zugangsdaten (kein Smoobu!):
 
-| Secret | Wert |
+| Secret | Wert (dient als …) |
 |---|---|
-| `SSH_HOST` | IONOS-SSH/SFTP-Host |
-| `SSH_PORT` | SSH-Port (meist `22`) |
-| `SSH_USERNAME` | IONOS-SSH-Benutzer |
-| `SSH_PASSWORD` | IONOS-SSH-Passwort |
-| `SSH_REMOTE_PATH` | Zielordner auf dem Webspace, z. B. `/rosengarten.casa/` |
+| `FTP_SERVER` | IONOS-SSH-Host |
+| `SSL_PORT` | SSH-Port (meist `22`) |
+| `FTP_USERNAME` | IONOS-SSH-Benutzer |
+| `FTP_PASSWORD` | IONOS-SSH-Passwort |
+| `FTP_SERVER_DIR` | Zielordner auf dem Webspace, z. B. `/rosengarten.casa/` |
 
-> **Achtung `--delete`:** rsync spiegelt `dist/` exakt in `SSH_REMOTE_PATH` –
-> Dateien im Zielordner, die nicht zur Seite gehören, werden dabei gelöscht.
-> `SSH_REMOTE_PATH` muss deshalb auf den **eigenen Rosengarten-Ordner** zeigen,
+> Die Namen sind historisch `FTP_*`, die Werte sind aber die **SSH-Zugangsdaten**
+> (rsync läuft über SSH). Auf IONOS-Webspace sind SFTP/SSH- und FTP-Zugang i. d. R.
+> dieselben Zugangsdaten.
+>
+> **Achtung `--delete`:** rsync spiegelt `dist/` exakt in `FTP_SERVER_DIR` –
+> Dateien im Zielordner, die nicht zur Seite gehören, werden gelöscht.
+> `FTP_SERVER_DIR` muss deshalb auf den **eigenen Rosengarten-Ordner** zeigen,
 > nicht auf einen gemeinsamen Wurzelordner mit anderen Seiten.
 
 ### 5. Fertig

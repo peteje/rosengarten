@@ -3,6 +3,13 @@ name: Deploy to IONOS Webspace
 # Es wird NICHT gebaut: die fertige dist/ kommt bereits fertig aus dem Repo
 # (lokal mit den Smoobu-Preisen gebaut, siehe villa.sh / DEPLOY.md). Hier wird
 # nur noch per rsync über SSH auf den IONOS-Webspace synchronisiert.
+#
+# Nutzt die vorhandenen Repo-Secrets (Namen wie eingerichtet):
+#   FTP_SERVER      -> SSH-Host
+#   SSL_PORT        -> SSH-Port
+#   FTP_USERNAME    -> SSH-Benutzer
+#   FTP_PASSWORD    -> SSH-Passwort
+#   FTP_SERVER_DIR  -> Zielordner auf dem Webspace
 on:
   push:
     branches: [ main ]
@@ -25,13 +32,13 @@ jobs:
 
       - name: Auf IONOS Webspace synchronisieren
         env:
-          FTP_HOST: ${{ secrets.SSH_HOST }}
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          FTP_USERNAME: ${{ secrets.SSH_USERNAME }}
-          FTP_PASSWORD: ${{ secrets.SSH_PASSWORD }}
-          FTP_REMOTE_PATH: ${{ secrets.SSH_REMOTE_PATH }}
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          SSL_PORT: ${{ secrets.SSL_PORT }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
-          sshpass -p "$SSH_PASSWORD" rsync -avzr --delete \
+          sshpass -p "$FTP_PASSWORD" rsync -avzr --delete \
             --exclude=".git*" \
-            -e "ssh -p ${SSH_PORT:-22} -o StrictHostKeyChecking=no" \
-            dist/ "${SSH_USERNAME}@${SSH_HOST}:${SSH_REMOTE_PATH}"
+            -e "ssh -p ${SSL_PORT:-22} -o StrictHostKeyChecking=no" \
+            dist/ "${FTP_USERNAME}@${FTP_SERVER}:${FTP_SERVER_DIR}"
