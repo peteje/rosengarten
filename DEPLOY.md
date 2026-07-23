@@ -27,16 +27,10 @@ Nach `deploy` läuft der Rest automatisch. Fortschritt im GitHub-Repo unter
 chmod +x villa.sh
 ```
 
-### 2. GitHub-Repo anlegen & verbinden
-Das Repo ist lokal bereits initialisiert (Branch `main`, erster Commit vorhanden).
-Auf github.com ein **leeres** Repo anlegen (ohne README/Lizenz), dann hier nur
-noch verbinden und hochladen (SSH-Remote, nutzt den eingerichteten SSH-Key –
-passwortlos):
-```bash
-git remote add origin git@github.com:<DEIN-KONTO>/rosengarten-astro.git
-git push -u origin main
-```
-(Ohne installiertes `gh` einfach über die GitHub-Weboberfläche „New repository".)
+### 2. GitHub-Repo verbunden ✔
+Erledigt: Das Repo liegt unter **`github.com/peteje/rosengarten`**, Remote via
+HTTPS (Push authentifiziert über den macOS-Schlüsselbund / osxkeychain – wie bei
+den anderen Repos, ohne Passwortabfrage).
 
 ### 3. GitHub-Secrets setzen
 Im Repo: **Settings → Secrets and variables → Actions → New repository secret**.
