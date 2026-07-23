@@ -1,0 +1,37 @@
+---
+import { Image } from 'astro:assets';
+import { getCover } from '../lib/galleries.js';
+
+interface Props {
+  slug: string;
+  name: string;
+  teaser: string;
+  priceFrom: number;
+  cover?: string;
+}
+
+const { slug, name, teaser, priceFrom, cover: coverName } = Astro.props;
+const cover = getCover(slug, coverName);
+---
+
+<a class="card" href={`/${slug}/`}>
+  <div class="card-media">
+    {cover ? (
+      <Image
+        src={cover}
+        alt={`${name} – Villa Rosengarten`}
+        widths={[400, 800]}
+        sizes="(max-width: 700px) 90vw, 350px"
+        loading="lazy"
+      />
+    ) : (
+      <div class="card-image-placeholder">Foto {name} folgt<br />(src/images/apartments/{slug}/)</div>
+    )}
+    <span class="card-badge">ab {priceFrom} €</span>
+  </div>
+  <div class="card-body">
+    <h3>{name}</h3>
+    <p>{teaser}</p>
+    <span class="card-cta">Details ansehen →</span>
+  </div>
+</a>

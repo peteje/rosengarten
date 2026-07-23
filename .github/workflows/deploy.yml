@@ -1,0 +1,48 @@
+name: Build & Deploy to IONOS
+
+# Läuft bei jedem Push nach main – und manuell über den "Run workflow"-Knopf.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Verhindert parallele Deploys (der jeweils neueste gewinnt).
+concurrency:
+  group: deploy-ionos
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Build (mit Smoobu-Preisen)
+        env:
+          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
+          SMOOBU_API_SECRET: ${{ secrets.SMOOBU_API_SECRET }}
+        run: npm run build
+
+      # Lädt den Inhalt von dist/ per FTPS in den IONOS-Webspace.
+      # Es wird inkrementell synchronisiert (nur geänderte Dateien), inkl.
+      # versteckter Dateien wie .htaccess. Vorhandene, nicht zum Projekt
+      # gehörende Dateien werden NICHT gelöscht.
+      - name: Deploy nach IONOS (FTPS)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./dist/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}

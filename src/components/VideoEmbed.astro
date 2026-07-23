@@ -1,0 +1,134 @@
+---
+// Datenschutzfreundliche YouTube-Einbettung ("Facade"/Lite-Embed) mit
+// zuverlässigem Sofort-Start:
+//  - Beim Seitenaufruf nur Vorschaubild + Play-Button (KEIN Kontakt zu YouTube).
+//  - Beim Überfahren/Fokussieren wird die YouTube-IFrame-Player-API vorgeladen,
+//    damit sie beim Klick sofort bereit ist.
+//  - Beim Klick wird der Player direkt aus der Nutzergeste heraus erzeugt und
+//    per playVideo() gestartet -> das Video läuft sofort, ohne zweiten Klick.
+//  - Fallback: Wenn die API blockiert ist, wird ein autoplay-iframe eingesetzt.
+//
+// Der Player läuft über youtube-nocookie.com. CSP in public/.htaccess muss
+// erlauben: script-src www.youtube.com + s.ytimg.com, frame-src
+// youtube-nocookie.com (Vorschaubilder: img-src https:).
+interface Props {
+  id: string;
+  title?: string;
+}
+const { id, title = 'Video abspielen' } = Astro.props;
+---
+
+<div class="video-embed" data-yt={id}>
+  <button class="video-facade" type="button" aria-label={title}>
+    <img
+      src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+      alt=""
+      loading="lazy"
+      width="480"
+      height="360"
+    />
+    <span class="video-play" aria-hidden="true"></span>
+  </button>
+</div>
+
+<script>
+  // --- YouTube IFrame API einmalig (und erst bei Bedarf) laden ---
+  let apiRequested = false;
+  const apiReadyQueue: Array<() => void> = [];
+
+  function ytApiReady(): boolean {
+    return !!(window as any).YT && !!(window as any).YT.Player;
+  }
+
+  function loadYtApi() {
+    if (apiRequested || ytApiReady()) return;
+    apiRequested = true;
+    const s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    s.async = true;
+    document.head.appendChild(s);
+    const prev = (window as any).onYouTubeIframeAPIReady;
+    (window as any).onYouTubeIframeAPIReady = () => {
+      if (typeof prev === 'function') prev();
+      apiReadyQueue.splice(0).forEach((fn) => fn());
+    };
+  }
+
+  function startPlayer(el: Element) {
+    const id = el.getAttribute('data-yt');
+    if (!id) return;
+    const target = document.createElement('div');
+    el.replaceChildren(target);
+    const create = () => {
+      try {
+        const player = new (window as any).YT.Player(target, {
+          host: 'https://www.youtube-nocookie.com',
+          videoId: id,
+          playerVars: {
+            autoplay: 1,
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1,
+            origin: window.location.origin,
+          },
+          events: {
+            onReady: (e: any) => {
+              e.target.playVideo();
+              // Falls der Browser Autoplay MIT Ton blockt (Safari/iOS):
+              // nach kurzer Zeit stumm erneut starten -> Video läuft sofort,
+              // Ton kann im Player aktiviert werden.
+              setTimeout(() => {
+                const YT = (window as any).YT;
+                const state = e.target.getPlayerState?.();
+                if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
+                  e.target.mute();
+                  e.target.playVideo();
+                }
+              }, 1000);
+            },
+          },
+        });
+      } catch (e) {
+        fallbackIframe(el, id);
+      }
+    };
+    if (ytApiReady()) create();
+    else {
+      loadYtApi();
+      apiReadyQueue.push(create);
+      // Fallback, falls die API nicht lädt (z. B. blockiert)
+      setTimeout(() => {
+        if (!ytApiReady()) fallbackIframe(el, id);
+      }, 2500);
+    }
+  }
+
+  function fallbackIframe(el: Element, id: string) {
+    if (el.querySelector('iframe')) return;
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&playsinline=1&rel=0`;
+    iframe.title = 'YouTube-Video';
+    iframe.setAttribute(
+      'allow',
+      'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+    );
+    iframe.allowFullscreen = true;
+    el.replaceChildren(iframe);
+  }
+
+  document.querySelectorAll('.video-embed[data-yt]').forEach((el) => {
+    const btn = el.querySelector('.video-facade');
+    if (!btn) return;
+    // Vorladen, sobald der Nutzer Interesse zeigt -> beim Klick sofort bereit
+    let preloaded = false;
+    const preload = () => {
+      if (!preloaded) {
+        preloaded = true;
+        loadYtApi();
+      }
+    };
+    btn.addEventListener('pointerenter', preload);
+    btn.addEventListener('focus', preload);
+    btn.addEventListener('click', () => startPlayer(el));
+  });
+</script>

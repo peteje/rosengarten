@@ -1,0 +1,32 @@
+---
+import { Image } from 'astro:assets';
+import ventovinte from '../images/ventovinte-logo.webp';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <strong>Villa Rosengarten</strong>
+        <p>Vier Ferienwohnungen in Burg auf Fehmarn.<br />Highspeed-WLAN · Sauna · Fitness · Hunde willkommen.</p>
+        <a class="footer-vv-link" href="https://www.ventovinte.com" target="_blank" rel="noopener" aria-label="VentoVinte – Website öffnen">
+          <span class="footer-vv-label">Ein Angebot von</span>
+          <Image src={ventovinte} alt="VentoVinte" class="footer-vv" loading="lazy" />
+        </a>
+      </div>
+      <div class="footer-contact">
+        <a href="tel:+4943716074284">+49 4371 6074284</a>
+        <a href="mailto:info@rosengarten.casa">info@rosengarten.casa</a>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="/impressum/">Impressum</a>
+      <a href="/datenschutz/">Datenschutz</a>
+      <a href="/agb/">AGB</a>
+      <a href="/kurtaxe/">Kurtaxe</a>
+      <a href="https://www.facebook.com/RosengartenFehmarn" target="_blank" rel="noopener">Facebook</a>
+    </div>
+    <p class="footer-copy">&copy; {year} Villa Rosengarten &middot; Burg auf Fehmarn</p>
+  </div>
+</footer>

@@ -1,0 +1,31 @@
+---
+// Minimaler Cookie-Consent-Banner (Ersatz für das WordPress-Plugin
+// "Real Cookie Banner"). Nur nötig, wenn ihr Tracking/Marketing-Skripte
+// (z. B. Google Analytics, AdSense) einsetzt. Ohne solche Skripte reicht
+// meist schon der Hinweis auf technisch notwendige Cookies in der
+// Datenschutzerklärung, ganz ohne Banner. Anpassen oder entfernen.
+---
+
+<div id="cookie-banner">
+  <span>
+    Diese Website verwendet Cookies, um bestimmte Funktionen bereitzustellen.
+    Details in unserer <a href="/datenschutz/">Datenschutzerklärung</a>.
+  </span>
+  <button id="cookie-accept">Verstanden</button>
+</div>
+
+<script>
+  const KEY = 'rosengarten-cookie-consent';
+  const banner = document.getElementById('cookie-banner');
+  const acceptBtn = document.getElementById('cookie-accept');
+
+  if (!localStorage.getItem(KEY)) {
+    banner?.classList.add('show');
+  }
+
+  acceptBtn?.addEventListener('click', () => {
+    localStorage.setItem(KEY, 'accepted');
+    banner?.classList.remove('show');
+    // Hier ggf. Analytics/Marketing-Skripte erst NACH Zustimmung laden.
+  });
+</script>

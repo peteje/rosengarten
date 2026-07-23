@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ApartmentCard from '../../components/ApartmentCard.astro';
+import { apartments } from '../../data/apartments.js';
+import { getPriceMap } from '../../lib/prices.js';
+
+const priceMap = await getPriceMap();
+---
+
+<Layout title="Ferienwohnungen" description="Übersicht aller Ferienwohnungen der Villa Rosengarten: Romantika, Sommerwind, Loft, Zwergenfee.">
+  <section class="wrap" style="padding-top:3rem;">
+    <h1 class="section-title">Unsere Ferienwohnungen</h1>
+    <div class="apartment-grid">
+      {apartments.map((apt) => (
+        <ApartmentCard
+          slug={apt.slug}
+          name={apt.name}
+          teaser={apt.teaser}
+          priceFrom={priceMap[apt.slug]}
+          cover={apt.cover}
+        />
+      ))}
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,48 @@
+---
+// Bindet den echten Smoobu-Belegungskalender (Single-Calendar-Widget) inline
+// ein – identisch zur Einbettung auf der bisherigen Seite rosengarten.casa.
+// aptId + verification stammen aus dem Smoobu-Dashboard (pro Wohnung).
+//
+// Voraussetzung: In public/.htaccess erlaubt die Content-Security-Policy die
+// Domain login.smoobu.com (script-src, style-src, connect-src, frame-src,
+// font-src) – sonst blockiert der Browser das Widget.
+interface Props {
+  aptId: string;
+  verification: string;
+  bookingUrl: string;
+  name: string;
+}
+const { aptId, verification, bookingUrl, name } = Astro.props;
+const loadUrl = `https://login.smoobu.com/de/cockpit/widget/single-calendar/${aptId}`;
+---
+
+<section class="booking" id="belegungskalender">
+  <h2 class="section-title">Belegungskalender {name}</h2>
+  <p class="section-lead">
+    Grün = frei, belegte Tage sind markiert. Für die verbindliche Buchung mit
+    sofortiger Bestätigung geht es direkt weiter zu unserem Buchungsportal.
+  </p>
+
+  <div class="smoobu-calendar">
+    <div class="calendarWidget" id={`smoobuApartment${aptId}de`}>
+      <div
+        class="calendarContent"
+        data-load-calendar-url={loadUrl}
+        data-verification={verification}
+        data-baseurl="https://login.smoobu.com"
+        data-disable-css="false"
+        data-controller="Apartment/SingleCalendar/initialize"
+      >
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-cta">
+    <a class="btn btn-lg" href={bookingUrl} target="_blank" rel="noopener">
+      {name} verbindlich buchen →
+    </a>
+    <a class="btn btn-ghost-dark" href="/kontakt/">Individuelle Anfrage</a>
+  </div>
+</section>
+
+<script is:inline type="text/javascript" src="https://login.smoobu.com/js/Apartment/CalendarWidget.js"></script>

@@ -1,0 +1,29 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+// Zahlungslink der Stadt Fehmarn (welcmpass) – Villa Rosengarten ist im
+// Formular bereits vorbelegt.
+const kurtaxeUrl =
+  'https://web.welcmpass.info/?active=true&addressCity=Fehmarn&addressStreetAndNumber=Gahlendorfer%20Weg%208&addressZip=23769&communeId=2192&id=3598&identificationNr=01054091-80025795-3598&name=Villa%20Rosengarten';
+---
+
+<Layout title="Kurtaxe" description="Kurtaxe für Ihren Aufenthalt in der Villa Rosengarten bequem online bezahlen.">
+  <section class="wrap" style="padding-top:3rem;">
+    <div class="legal-content">
+      <h1>Kurtaxe bequem online bezahlen</h1>
+      <p>
+        Die Stadt Fehmarn bietet eine digitale Zahlung der Kurtaxe an. Über den
+        folgenden Link können Sie Ihre Kurabgabe bequem online begleichen. Die
+        Villa Rosengarten ist im Formular bereits hinterlegt. Sie können den Beleg
+        anschließend ausdrucken oder digital speichern.
+      </p>
+      <p style="text-align:center; margin:2rem 0;">
+        <a class="btn" href={kurtaxeUrl} target="_blank" rel="noopener">Kurtaxe jetzt online bezahlen →</a>
+      </p>
+      <p style="text-align:center; color:#776;">
+        Klicken Sie auf den Kurtaxe-Button oder scannen Sie vor Ort den QR-Code in
+        Ihrer Ferienwohnung.
+      </p>
+    </div>
+  </section>
+</Layout>

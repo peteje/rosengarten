@@ -1,0 +1,31 @@
+{
+  "_hinweis": "Reihenfolge & Zuordnung der Fotos, wie sie am 22.07.2026 auf rosengarten.casa eingebunden waren. Dient als Vergleichsbasis, um die vom Nutzer gelieferten Originale den Wohnungen zuzuordnen und in gleicher Reihenfolge einzubauen. WordPress-Suffixe wie '-scaled' oder '-1024x683' sind Groessenvarianten und beim Original meist nicht vorhanden -> Abgleich ueber den Basisnamen.",
+  "_stock_hinweis": "Dateien mit 'AdobeStock_' oder 'unsplash' sind generische Stock-/Hintergrundbilder, keine echten Raumfotos -> werden standardmaessig NICHT in die Galerie uebernommen.",
+  "romantika": [
+    "Romantika-1", "Romantika-7", "IMG_5736", "HHUG-10", "HHUEZ-3", "IMG_7437-1",
+    "Rosengarten-15", "HHUG-26", "HHUG-21", "HHUG-18", "HHUG-8", "HHUG-6", "HHUG-5",
+    "IMG_7620", "IMG_7618", "IMG_7587", "IMG_7586", "HHUWZ-1", "HHUEZ-1-2",
+    "IMG_7590", "IMG_7604", "IMG_7622"
+  ],
+  "sommerwind": [
+    "IMG_4644", "IMG_7576", "IMG_7552", "IMG_6071", "IMG_5877", "Sommerwind-10",
+    "IMG_7562", "IMG_7577", "IMG_7561", "IMG_4479", "HHOG-21", "HHOG-20", "HHOG-7",
+    "HHOG-5", "HHOG-27", "IMG_7563", "IMG_7570", "Bad1", "IMG_6760", "IMG_6694",
+    "IMG_6068"
+  ],
+  "loft": [
+    "Unbenannt", "IMG_6363-2", "IMG_6994", "IMG_6986", "IMG_6913", "IMG_6375",
+    "IMG_2992", "518A5992-9F0B-4C8C-8487-93239434C25E", "IMG_2538", "IMG_6606", "IMG_0200"
+  ],
+  "zwergenfee": [
+    "ZF-3", "IMG_7002", "IMG_7005", "IMG_20150725_142622", "IMG_7003", "IMG_6999",
+    "IMG_7000", "IMG_7065", "IMG_6694"
+  ],
+  "villa": [
+    "IMG_3149", "IMG_5812", "IMG_5721", "IMG_5719"
+  ],
+  "_stock_ausgeschlossen": [
+    "AdobeStock_354404503", "AdobeStock_202077052", "AdobeStock_331385071",
+    "AdobeStock_459329282", "AdobeStock_392346508", "sylvie-tittel-673971-unsplash"
+  ]
+}

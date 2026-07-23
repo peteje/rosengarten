@@ -1,0 +1,55 @@
+# --- Villa Rosengarten – .htaccess für IONOS-Webspace (Apache) ---
+# Diese Datei bleibt in public/ und landet beim Build automatisch als
+# dist/.htaccess -> beim Hochladen per SFTP mit ins Webspace-Root legen
+# (versteckte Datei – im FTP-Client "versteckte Dateien anzeigen" aktivieren!).
+
+# ------------------------------------------------------------------
+# HTTPS erzwingen
+# ------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ------------------------------------------------------------------
+# Security-Header
+# ------------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Verhindert MIME-Type-Sniffing durch den Browser
+  Header always set X-Content-Type-Options "nosniff"
+
+  # Verbietet das Einbetten der Seite in fremde <iframe>s (Clickjacking-Schutz)
+  Header always set X-Frame-Options "SAMEORIGIN"
+
+  # Schickt beim Klick auf externe Links nur die Domain mit, nicht den vollen Pfad
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+  # Browser-Funktionen einschränken, die die Seite nicht braucht
+  Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+  # HSTS: Browser merkt sich, künftig immer HTTPS zu verwenden
+  # (max-age in Sekunden; 31536000 = 1 Jahr)
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+  # Content-Security-Policy: erlaubt eigene Domain plus die konkret
+  # genutzten externen Einbettungen (Smoobu-Buchung, Google Maps).
+  # WICHTIG: Wenn ihr weitere Dienste einbindet (z.B. Google Analytics,
+  # AdSense, YouTube-Embed), müsst ihr deren Domains hier ergänzen –
+  # sonst blockiert der Browser sie stillschweigend.
+  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://login.smoobu.com; script-src 'self' https://login.smoobu.com https://www.youtube.com https://s.ytimg.com; connect-src 'self' https://login.smoobu.com; font-src 'self' https://login.smoobu.com data:; frame-src https://9a350089.smoobu.net https://login.smoobu.com https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com; base-uri 'self'; form-action 'self'; object-src 'none'"
+</IfModule>
+
+# Apache-Version/Server-Details nicht preisgeben
+ServerSignature Off
+
+# Verzeichnis-Listing verhindern, falls mal eine index.html fehlt
+Options -Indexes
+
+# Zugriff auf sensible/nicht für Besucher bestimmte Dateien sperren
+<FilesMatch "\.(env|log|md|sh|ini|bak)$">
+  Require all denied
+</FilesMatch>
+
+# Eigene 404-Seite
+ErrorDocument 404 /404.html

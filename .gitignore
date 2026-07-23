@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+# Geheime Umgebungsvariablen (z. B. SMOOBU_API_KEY) – nie committen
+.env
+.env.*
+
+# Roh-Mediathek (nur Quelle für den Foto-Import; die einsortierten
+# Galeriebilder unter src/images/ werden versioniert)
+_originale/

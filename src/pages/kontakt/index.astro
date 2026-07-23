@@ -1,0 +1,73 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Kontakt" description="Kontakt & Buchungsanfrage – schreiben Sie der Villa Rosengarten auf Fehmarn für ein individuelles Angebot.">
+  <section class="wrap" style="padding-top:3rem;">
+    <h1 class="section-title">Kontakt &amp; Buchungsanfrage</h1>
+
+    <p style="text-align:center; max-width:640px; margin:0 auto 2rem;">
+      Sie haben Fragen zu einer Ferienwohnung, möchten einen kürzeren Aufenthalt
+      anfragen oder wünschen ein individuelles Angebot? Schreiben Sie uns gerne –
+      wir melden uns persönlich zurück.
+    </p>
+
+    <!--
+      Formular-Backend: public/contact.php (läuft direkt im IONOS-Webspace
+      via PHP mail(), kein Drittanbieter nötig; Empfänger/Absender sind dort
+      gesetzt). Nur relevant, falls die Seite mal ohne PHP gehostet wird:
+      dann Formspree (https://formspree.io) oder Netlify Forms verwenden.
+    -->
+    <div id="form-message" style="display:none; max-width:560px; margin:0 auto 1.5rem; padding:1rem; border-radius:8px;"></div>
+
+    <form class="contact-form" action="/contact.php" method="POST">
+      <!-- Honeypot-Feld gegen Spam-Bots: für Menschen unsichtbar, bleibt leer -->
+      <div style="position:absolute; left:-9999px;" aria-hidden="true">
+        <label for="website">Bitte freilassen</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div>
+        <label for="email">E-Mail</label>
+        <input type="email" id="email" name="email" required />
+      </div>
+      <div>
+        <label for="message">Nachricht</label>
+        <textarea id="message" name="message" required></textarea>
+      </div>
+      <button class="btn" type="submit">Nachricht senden</button>
+    </form>
+
+    <p style="text-align:center; margin-top:2rem;">
+      Oder direkt:
+      <a href="mailto:info@rosengarten.casa">info@rosengarten.casa</a>
+      &middot;
+      <a href="tel:+4943716074284">+49 4371 6074284</a>
+    </p>
+
+    <script>
+      // Zeigt eine Fehlermeldung, falls contact.php mit ?error=... zurückleitet.
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get('error');
+      if (error) {
+        const box = document.getElementById('form-message');
+        if (box) {
+          const messages = {
+            missing: 'Bitte alle Felder ausfüllen.',
+            email: 'Bitte eine gültige E-Mail-Adresse eingeben.',
+            send: 'Die Nachricht konnte nicht versendet werden. Bitte später erneut versuchen oder direkt per E-Mail schreiben.',
+            method: 'Unerwarteter Fehler. Bitte das Formular erneut absenden.',
+          };
+          box.textContent = messages[error] || 'Es ist ein Fehler aufgetreten. Bitte erneut versuchen.';
+          box.style.display = 'block';
+          box.style.background = '#fbe4e4';
+          box.style.color = '#7a1f1f';
+        }
+      }
+    </script>
+  </section>
+</Layout>
