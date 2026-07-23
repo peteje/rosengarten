@@ -28,11 +28,10 @@ chmod +x villa.sh
 ```
 
 ### 2. GitHub-Repo anlegen & verbinden
-Repo auf github.com anlegen (leer, ohne README), dann hier:
+Das Repo ist lokal bereits initialisiert (Branch `main`, erster Commit vorhanden).
+Auf github.com ein **leeres** Repo anlegen (ohne README/Lizenz), dann hier nur
+noch verbinden und hochladen:
 ```bash
-git add -A
-git commit -m "Initialer Stand"
-git branch -M main
 git remote add origin https://github.com/<DEIN-KONTO>/rosengarten-astro.git
 git push -u origin main
 ```
