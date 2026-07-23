@@ -26,8 +26,14 @@ const API_HOST = 'https://login.smoobu.com';
 const API_PATH = '/api/rates';
 const EMPTY_BODY_HASH = crypto.createHash('sha256').update('').digest('hex');
 
+// Lokales Datum als YYYY-MM-DD (NICHT toISOString/UTC – sonst kann das
+// Startdatum in Zeitzonen östlich von UTC einen Tag in die Vergangenheit
+// rutschen). Der Build-Container wird auf TZ=Europe/Berlin gesetzt (villa.sh).
 function fmtDate(d) {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }
 
 // ISO-8601-UTC ohne Millisekunden, z. B. 2026-04-01T12:00:00Z
@@ -113,8 +119,9 @@ async function fetchPriceData() {
     const start = new Date();
     const end = new Date();
     end.setDate(end.getDate() + 365);
+    const startStr = fmtDate(start);
 
-    const res = await requestRates(fmtDate(start), fmtDate(end), ids);
+    const res = await requestRates(startStr, fmtDate(end), ids);
     if (!res.ok) {
       const body = await res.text().catch(() => '');
       throw new Error(`HTTP ${res.status} ${body.slice(0, 160)}`);
@@ -123,6 +130,7 @@ async function fetchPriceData() {
     const json = await res.json();
     const data = json.data || {};
     const map = { ...fallbackMap };
+    const debug = {};
     let globalMin = Infinity;
     let globalMax = 0;
 
@@ -130,16 +138,27 @@ async function fetchPriceData() {
       const byDate = data[apt.smoobuId];
       if (!byDate) continue;
       let min = Infinity;
-      for (const day of Object.values(byDate)) {
+      let minDate = null;
+      let maxForApt = 0;
+      for (const [date, day] of Object.entries(byDate)) {
+        // Sicherheitsnetz: nur heutige/zukünftige Tage berücksichtigen, falls
+        // die API doch mal einen Tag vor dem angefragten Startdatum liefert.
+        if (date < startStr) continue;
         const price = day && day.price;
         if (typeof price === 'number' && price > 0) {
-          if (price < min) min = price;
+          if (price < min) { min = price; minDate = date; }
+          if (price > maxForApt) maxForApt = price;
           if (price < globalMin) globalMin = price;
           if (price > globalMax) globalMax = price;
         }
       }
-      if (min !== Infinity) map[apt.slug] = Math.round(min);
+      if (min !== Infinity) {
+        map[apt.slug] = Math.round(min);
+        debug[apt.slug] = `ab ${Math.round(min)} € (günstigster Tag ${minDate}, teuerster ${Math.round(maxForApt)} €)`;
+      }
     }
+    console.log('[prices] Details je Wohnung:');
+    for (const [slug, info] of Object.entries(debug)) console.log(`  ${slug}: ${info}`);
 
     const result = {
       map,
