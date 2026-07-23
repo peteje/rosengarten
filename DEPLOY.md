@@ -1,7 +1,7 @@
 # Deployment – Villa Rosengarten
 
 **Variante B:** Der Build läuft **lokal** (mit den Smoobu-Preisen), die fertige
-`dist/` wird ins Repo gepusht, und GitHub Actions lädt sie per **FTPS** zu IONOS.
+`dist/` wird ins Repo gepusht, und GitHub Actions lädt sie per **rsync über SSH** zu IONOS.
 So bleibt der **Smoobu-Key ausschließlich lokal** – bei GitHub liegen nur die
 FTP-Zugangsdaten.
 
@@ -12,7 +12,7 @@ Lokal muss **kein Node** installiert sein – alles läuft über Docker.
    │  Build mit Smoobu-Key (lokal)  →  dist/
    │  git push  (Quelle + dist/)
    ▼
-[GitHub]  Action lädt dist/ per FTPS hoch
+[GitHub]  Action synct dist/ per rsync/SSH hoch
    ▼
 [IONOS-Webspace]  live
 ```
@@ -54,19 +54,22 @@ Das Repo liegt unter **`github.com/peteje/rosengarten`** (Remote via HTTPS,
 Authentifizierung über den macOS-Schlüsselbund – ohne Passwortabfrage).
 
 ### 4. GitHub-Secrets für den IONOS-Upload
-Im Repo: **Settings → Secrets and variables → Actions → New repository secret**.
-Nur die FTP-Zugangsdaten (kein Smoobu!):
+Der Upload läuft per **rsync über SSH** (Passwort-Auth, wie bei der
+energieteam-fehmarn-Seite). Im Repo: **Settings → Secrets and variables →
+Actions → New repository secret**. Nur die SSH-Zugangsdaten (kein Smoobu!):
 
 | Secret | Wert |
 |---|---|
-| `FTP_SERVER` | IONOS-FTP-Server (aus dem IONOS-Kundencenter) |
-| `FTP_USERNAME` | IONOS-FTP-Benutzername |
-| `FTP_PASSWORD` | IONOS-FTP-Passwort |
-| `FTP_SERVER_DIR` | Zielordner auf dem Webspace, **mit Schrägstrich am Ende**. Domain-Wurzel: `./` – oder z. B. `/rosengarten.casa/` |
+| `SSH_HOST` | IONOS-SSH/SFTP-Host |
+| `SSH_PORT` | SSH-Port (meist `22`) |
+| `SSH_USERNAME` | IONOS-SSH-Benutzer |
+| `SSH_PASSWORD` | IONOS-SSH-Passwort |
+| `SSH_REMOTE_PATH` | Zielordner auf dem Webspace, z. B. `/rosengarten.casa/` |
 
-> Sind es dieselben FTP-Daten wie für die energieteam-fehmarn-Seite, einfach die
-> gleichen Werte hier als Repo-Secrets eintragen (Secrets gelten pro Repo) und
-> ggf. nur `FTP_SERVER_DIR` auf den Rosengarten-Zielordner setzen.
+> **Achtung `--delete`:** rsync spiegelt `dist/` exakt in `SSH_REMOTE_PATH` –
+> Dateien im Zielordner, die nicht zur Seite gehören, werden dabei gelöscht.
+> `SSH_REMOTE_PATH` muss deshalb auf den **eigenen Rosengarten-Ordner** zeigen,
+> nicht auf einen gemeinsamen Wurzelordner mit anderen Seiten.
 
 ### 5. Fertig
 Ab jetzt genügt `./villa.sh deploy "…"`.
@@ -83,6 +86,6 @@ Ab jetzt genügt `./villa.sh deploy "…"`.
   vor dem Push frisch gebaut wird.
 - **Preise aktualisieren**: einfach erneut `./villa.sh deploy` – der Build zieht
   die aktuellen Smoobu-Preise.
-- **IONOS-Zugänge**: FTP/FTPS-Benutzer im IONOS-Kundencenter unter
-  *Hosting → SFTP/FTP-Zugänge*. IONOS unterstützt FTPS (verschlüsselt).
-- **Manuell auslösen**: *Actions → Deploy dist to IONOS → Run workflow*.
+- **IONOS-Zugänge**: SSH/SFTP-Benutzer im IONOS-Kundencenter unter
+  *Hosting → SFTP/SSH-Zugänge*.
+- **Manuell auslösen**: *Actions → Deploy to IONOS Webspace → Run workflow*.

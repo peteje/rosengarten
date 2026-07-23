@@ -1,12 +1,11 @@
-name: Deploy dist to IONOS
+name: Deploy to IONOS Webspace
 
-# Läuft bei jedem Push nach main – und manuell über "Run workflow".
 # Es wird NICHT gebaut: die fertige dist/ kommt bereits fertig aus dem Repo
-# (lokal mit den Smoobu-Preisen gebaut). Hier wird nur noch hochgeladen.
+# (lokal mit den Smoobu-Preisen gebaut, siehe villa.sh / DEPLOY.md). Hier wird
+# nur noch per rsync über SSH auf den IONOS-Webspace synchronisiert.
 on:
   push:
-    branches: [main]
-    paths: ['dist/**']
+    branches: [ main ]
   workflow_dispatch:
 
 concurrency:
@@ -15,20 +14,24 @@ concurrency:
 
 jobs:
   deploy:
+    name: Deploy per rsync über SSH (Passwort-Auth)
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Code auschecken
         uses: actions/checkout@v4
 
-      # Lädt den Inhalt von dist/ per FTPS in den IONOS-Webspace (inkrementell,
-      # inkl. versteckter Dateien wie .htaccess). Nicht zum Projekt gehörende
-      # Dateien auf dem Server werden NICHT gelöscht.
-      - name: Deploy nach IONOS (FTPS)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+      - name: sshpass installieren
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Auf IONOS Webspace synchronisieren
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+          SSH_REMOTE_PATH: ${{ secrets.SSH_REMOTE_PATH }}
+        run: |
+          sshpass -p "$SSH_PASSWORD" rsync -avzr --delete \
+            --exclude=".git*" \
+            -e "ssh -p ${SSH_PORT:-22} -o StrictHostKeyChecking=no" \
+            dist/ "${SSH_USERNAME}@${SSH_HOST}:${SSH_REMOTE_PATH}"
