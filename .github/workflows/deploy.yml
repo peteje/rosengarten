@@ -38,6 +38,11 @@ jobs:
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
+          # Zielordner auf dem Webspace anlegen, falls er noch nicht existiert
+          sshpass -p "$FTP_PASSWORD" ssh -p "${SSL_PORT:-22}" \
+            -o StrictHostKeyChecking=no \
+            "${FTP_USERNAME}@${FTP_SERVER}" "mkdir -p '${FTP_SERVER_DIR}'"
+          # dist/ synchronisieren
           sshpass -p "$FTP_PASSWORD" rsync -avzr --delete \
             --exclude=".git*" \
             -e "ssh -p ${SSL_PORT:-22} -o StrictHostKeyChecking=no" \
