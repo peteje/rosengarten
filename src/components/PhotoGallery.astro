@@ -6,9 +6,13 @@ interface Props {
   name: string;
   minTile?: number; // Mindestbreite einer Kachel in px (grid)
   layout?: 'grid' | 'masonry';
+  // Feste Spaltenzahl (Desktop/Mobile) statt automatischem auto-fill-Raster.
+  // Sorgt dafür, dass jede Zeile gleich viele Kacheln hat (kein "abgeschnittener"
+  // letzter Reihe). Bildanzahl sollte durch beide Werte teilbar sein.
+  cols?: { desktop: number; mobile: number };
 }
 
-const { images, name, minTile = 200, layout = 'grid' } = Astro.props;
+const { images, name, minTile = 200, layout = 'grid', cols } = Astro.props;
 
 const fulls = await Promise.all(
   images.map((img) => getImage({ src: img, width: 2000, format: 'webp' }))
@@ -19,9 +23,13 @@ const fulls = await Promise.all(
   images.length > 0 && (
     <>
       <div
-        class:list={['gallery', layout === 'masonry' && 'gallery--masonry']}
+        class:list={[
+          'gallery',
+          layout === 'masonry' && 'gallery--masonry',
+          cols && 'gallery--fixed-cols',
+        ]}
         data-gallery
-        style={`--min-tile:${minTile}px;`}
+        style={`--min-tile:${minTile}px;${cols ? `--cols-desktop:${cols.desktop};--cols-mobile:${cols.mobile};` : ''}`}
       >
         {images.map((img, i) => (
           <button

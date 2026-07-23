@@ -1,10 +1,14 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import PhotoGallery from '../../components/PhotoGallery.astro';
 import { Image } from 'astro:assets';
 import { getVillaImages } from '../../lib/galleries.js';
 
 const villaImages = getVillaImages();
 const hero = villaImages[0] ?? null;
+// Alle weiteren Villa-Fotos (u. a. das Segelboot-Foto) als Galerie unter dem
+// Hero zeigen, statt sie ungenutzt zu lassen.
+const galleryImages = villaImages.slice(1);
 ---
 
 <Layout title="Die Villa" description="Über die Villa Rosengarten und ihre Geschichte – 1920 erbaut, seit 2015 liebevoll restauriert.">
@@ -48,7 +52,18 @@ const hero = villaImages[0] ?? null;
         Unsere Fitness-Anlage und Sauna sind für individuell buchbare Termine
         geöffnet. Auch Haustiere sind bei uns willkommen.
       </p>
+    </div>
+  </section>
 
+  {galleryImages.length > 0 && (
+    <section class="wrap">
+      <h2 class="section-title">Impressionen der Villa</h2>
+      <PhotoGallery images={galleryImages} name="Villa Rosengarten" layout="masonry" />
+    </section>
+  )}
+
+  <section class="wrap">
+    <div class="legal-content">
       <h2>Die Wohnungen im Überblick</h2>
       <ul>
         <li><strong>Zwergenfee</strong> – im Anbau</li>
