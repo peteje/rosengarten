@@ -1,7 +1,10 @@
 node_modules/
-dist/
 .astro/
 .DS_Store
+
+# Lokale Secrets (Smoobu) – niemals committen
+.villa-secrets.env
+villa-secrets.env
 
 # Geheime Umgebungsvariablen (z. B. SMOOBU_API_KEY) – nie committen
 .env
