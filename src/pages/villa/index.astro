@@ -3,54 +3,76 @@ import Layout from '../../layouts/Layout.astro';
 import PhotoGallery from '../../components/PhotoGallery.astro';
 import { Image } from 'astro:assets';
 import { getVillaImages } from '../../lib/galleries.js';
+import heroVilla from '../../images/home/hero-villa.jpg';
 
-const villaImages = getVillaImages();
-const hero = villaImages[0] ?? null;
-// Alle weiteren Villa-Fotos (u. a. das Segelboot-Foto) als Galerie unter dem
-// Hero zeigen, statt sie ungenutzt zu lassen.
-const galleryImages = villaImages.slice(1);
+// Sonniges Frontfoto als Hero (statt der Dämmerungs-Luftaufnahme – wirkt
+// deutlich sommerlicher). Die Luftaufnahme bleibt in der Galerie darunter.
+const hero = heroVilla;
+const galleryImages = getVillaImages();
 ---
 
 <Layout title="Die Villa" description="Über die Villa Rosengarten und ihre Geschichte – 1920 erbaut, seit 2015 liebevoll restauriert.">
   <section class="wrap" style="padding-top:3rem;">
-    <p class="eyebrow">About Villa Rosengarten &amp; Our Story</p>
-    <h1>Über unsere Villa</h1>
-    {hero ? (
-      <Image
-        class="villa-hero"
-        src={hero}
-        alt="Villa Rosengarten"
-        widths={[600, 1000, 1600]}
-        sizes="(max-width: 1100px) 100vw, 1040px"
-        loading="eager"
-      />
-    ) : (
-      <div class="card-image-placeholder" style="margin-bottom:1.5rem;">
-        Foto der Villa folgt (src/images/villa/)
-      </div>
-    )}
+    <p class="eyebrow">Villa Rosengarten</p>
+    <h1>Unsere Geschichte</h1>
+    <Image
+      class="villa-hero"
+      src={hero}
+      alt="Villa Rosengarten im Sommer"
+      widths={[600, 1000, 1600]}
+      sizes="(max-width: 1100px) 100vw, 1040px"
+      loading="eager"
+    />
 
     <div class="legal-content">
       <p>
-        Fehmarn war oft unser Ziel, zum Kiten oder einfach um mit den Hunden am
-        Strand zu sein.
+        Fehmarn war für uns lange mehr als nur ein Reiseziel. Es war der Ort,
+        an den wir immer wieder zurückkehrten – zum Kitesurfen, für
+        ausgedehnte Spaziergänge mit unseren Hunden am Meer oder einfach, um
+        die Ruhe, den Wind und die besondere Atmosphäre der Insel zu genießen.
       </p>
       <p>
-        Bei einem unserer Besuche fiel uns die Villa ins Auge. Auf den ersten
-        Blick haben wir uns in das Objekt verliebt und hatten 2015 die
-        Gelegenheit, das Anwesen zu übernehmen. Mit aufwändiger Restauration und
-        Umbauarbeiten ist eine moderne Umgebung in der 1920 erbauten Villa
-        entstanden.
+        Bei einem dieser Besuche entdeckten wir die Villa Rosengarten. Schon
+        beim ersten Anblick war klar: Dieses Haus hat eine Seele. Die
+        Architektur, der alte Baumbestand und der Charme des Anwesens haben
+        uns sofort begeistert. Als sich 2015 die Möglichkeit ergab, die Villa
+        zu übernehmen, mussten wir nicht lange überlegen.
       </p>
       <p>
-        Professionelles WLAN mit High-Speed-Internet ermöglicht unseren Gästen
-        Remote Office in einer perfekten Umgebung. Der hohe Freizeitwert auf
-        Fehmarn, nicht nur für Wassersportler, macht die Villa zum idealen Ziel
-        für alle, die dem Alltag entkommen wollen.
+        Mit viel Leidenschaft, Liebe zum Detail und großem Respekt vor der
+        Geschichte des Hauses haben wir die 1920 erbaute Villa aufwendig
+        restauriert und modernisiert. Unser Ziel war es, den ursprünglichen
+        Charakter zu bewahren und gleichzeitig einen Ort zu schaffen, an dem
+        sich unsere Gäste rundum wohlfühlen – stilvoll, komfortabel und mit
+        allen Annehmlichkeiten, die einen entspannten Aufenthalt ausmachen.
       </p>
       <p>
-        Unsere Fitness-Anlage und Sauna sind für individuell buchbare Termine
-        geöffnet. Auch Haustiere sind bei uns willkommen.
+        Heute verbindet die Villa Rosengarten historische Eleganz mit
+        modernem Wohnkomfort. Professionelles High-Speed-WLAN macht sie
+        ebenso zum perfekten Rückzugsort für Remote Work wie für einen
+        längeren Urlaub. Wer morgens mit Blick ins Grüne arbeitet und den
+        Feierabend am Strand oder auf dem Wasser verbringt, erlebt eine ganz
+        besondere Balance zwischen Arbeit und Erholung.
+      </p>
+      <p>
+        Fehmarn bietet das ganze Jahr über außergewöhnliche Möglichkeiten:
+        endlose Strände, Natur, Wassersport, Radwege und die Weite der
+        Ostsee. Ob Kitesurfer, Radfahrer, Hundebesitzer, Naturliebhaber oder
+        einfach Menschen, die dem Alltag für eine Weile entfliehen möchten –
+        hier findet jeder seinen persönlichen Lieblingsplatz.
+      </p>
+      <p>
+        Unsere kleine Fitness-Anlage und die Sauna stehen unseren Gästen nach
+        individueller Terminvereinbarung zur Verfügung und laden dazu ein,
+        Körper und Geist etwas Gutes zu tun. Selbstverständlich sind auch
+        vierbeinige Familienmitglieder herzlich willkommen – denn wir wissen
+        aus eigener Erfahrung, dass ein Urlaub erst dann vollkommen ist, wenn
+        der beste Freund des Menschen dabei sein kann.
+      </p>
+      <p>
+        Wir freuen uns darauf, Sie in der Villa Rosengarten willkommen zu
+        heißen und unsere Begeisterung für diesen besonderen Ort mit Ihnen zu
+        teilen.
       </p>
     </div>
   </section>
