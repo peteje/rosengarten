@@ -29,11 +29,10 @@ const loadUrl = `https://login.smoobu.com/de/cockpit/widget/single-calendar/${ap
         class="calendarContent"
         data-load-calendar-url={loadUrl}
         data-verification={verification}
-        data-baseurl="https://login.smoobu.com"
+        data-baseUrl="https://login.smoobu.com"
         data-disable-css="false"
-        data-controller="Apartment/SingleCalendar/initialize"
-      >
-      </div>
+      ></div>
+      <script is:inline type="text/javascript" src="https://login.smoobu.com/js/Apartment/CalendarWidget.js"></script>
     </div>
   </div>
 
@@ -44,5 +43,3 @@ const loadUrl = `https://login.smoobu.com/de/cockpit/widget/single-calendar/${ap
     <a class="btn btn-ghost-dark" href="/kontakt/">Individuelle Anfrage</a>
   </div>
 </section>
-
-<script is:inline type="text/javascript" src="https://login.smoobu.com/js/Apartment/CalendarWidget.js"></script>
