@@ -41,7 +41,10 @@ jobs:
           FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
         run: |
           export LFTP_PASSWORD="$FTP_PASSWORD"
-          # debug 3: protokolliert jede einzelne SFTP-Anfrage/Antwort im
-          # Klartext, damit im Fehlerfall sichtbar ist, welcher konkrete Pfad
-          # das "Permission denied" auslöst (statt nur der Sammelmeldung).
-          lftp -u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER" -e "debug 3; set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose ./dist/ \"$FTP_SERVER_DIR\"; bye"
+          # --exclude '^rosengarten/': auf dem Webspace liegt (aus der alten
+          # Chroot-Doppelpfad-Verwechslung) noch ein verwaister Ordner
+          # "rosengarten/", den dieser SFTP-Account nicht löschen darf. Ohne
+          # diesen Ausschluss versucht --delete ihn bei jedem Deploy erneut zu
+          # entfernen und scheitert dann mit "Permission denied". Der
+          # Ausschluss lässt lftp den Ordner komplett ignorieren.
+          lftp -u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
