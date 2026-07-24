@@ -3,6 +3,9 @@
 // Lege die Originalfotos einfach hier ab:
 //   src/images/apartments/<slug>/...   (z. B. src/images/apartments/romantika/01-kamin.jpg)
 //   src/images/villa/...               (Aussen-/Story-Fotos der Villa)
+//   src/images/impressionen/...        (Startseite: Insel-/Villa-Impressionen)
+//   src/images/wintervilla/...         (Seite /wintervilla/)
+//   src/images/sauna-fitness/...       (Seite /sauna-fitness/)
 //
 // Jede Datei wird von Astro automatisch optimiert (AVIF/WebP, responsive,
 // lazy). Die Reihenfolge in der Galerie ergibt sich aus dem Dateinamen
@@ -20,10 +23,29 @@ const villaModules = import.meta.glob(
   { eager: true }
 );
 
+const impressionenModules = import.meta.glob(
+  '/src/images/impressionen/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
+  { eager: true }
+);
+
+const wintervillaModules = import.meta.glob(
+  '/src/images/wintervilla/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
+  { eager: true }
+);
+
+const saunaFitnessModules = import.meta.glob(
+  '/src/images/sauna-fitness/*.{jpg,jpeg,png,webp,avif,JPG,JPEG,PNG,WEBP}',
+  { eager: true }
+);
+
 function sortByPath(entries) {
   return entries.sort(([a], [b]) =>
     a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' })
   );
+}
+
+function allFrom(modules) {
+  return sortByPath(Object.entries(modules)).map(([, mod]) => mod.default);
 }
 
 // Alle Galeriebilder einer Wohnung (ImageMetadata[]), in Dateinamen-Reihenfolge.
@@ -58,5 +80,20 @@ function getGalleryEntries(slug) {
 
 // Villa-/Story-Fotos.
 export function getVillaImages() {
-  return sortByPath(Object.entries(villaModules)).map(([, mod]) => mod.default);
+  return allFrom(villaModules);
+}
+
+// Startseite: Insel-/Villa-Impressionen.
+export function getImpressionenImages() {
+  return allFrom(impressionenModules);
+}
+
+// Seite /wintervilla/.
+export function getWintervillaImages() {
+  return allFrom(wintervillaModules);
+}
+
+// Seite /sauna-fitness/.
+export function getSaunaFitnessImages() {
+  return allFrom(saunaFitnessModules);
 }

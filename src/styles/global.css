@@ -1225,3 +1225,41 @@ form.contact-form textarea {
     grid-template-columns: repeat(var(--cols-mobile, 2), 1fr);
   }
 }
+
+/* --- Related-Karten (Villa-Seite: Wintervilla / Sauna & Fitness) --- */
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+.related-card {
+  display: block;
+  background: #fff;
+  border: 1px solid #eee0d8;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.related-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+.related-card h3 {
+  margin: 0 0 0.5rem;
+}
+.related-card p {
+  margin: 0 0 1rem;
+  color: #6b625a;
+}
+.related-cta {
+  color: var(--color-green);
+  font-weight: 600;
+}
+
+/* exp-tile kann als <a> gerendert werden (verlinkte Kacheln) */
+a.exp-tile {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}

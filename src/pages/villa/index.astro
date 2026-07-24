@@ -3,10 +3,8 @@ import Layout from '../../layouts/Layout.astro';
 import PhotoGallery from '../../components/PhotoGallery.astro';
 import { Image } from 'astro:assets';
 import { getVillaImages } from '../../lib/galleries.js';
-import heroVilla from '../../images/home/hero-villa.jpg';
+import heroVilla from '../../images/villa-hero.jpg';
 
-// Sonniges Frontfoto als Hero (statt der Dämmerungs-Luftaufnahme – wirkt
-// deutlich sommerlicher). Die Luftaufnahme bleibt in der Galerie darunter.
 const hero = heroVilla;
 const galleryImages = getVillaImages();
 ---
@@ -88,11 +86,26 @@ const galleryImages = getVillaImages();
     <div class="legal-content">
       <h2>Die Wohnungen im Überblick</h2>
       <ul>
-        <li><strong>Zwergenfee</strong> – im Anbau</li>
-        <li><strong>Loft</strong> – im Souterrain</li>
-        <li><strong>Romantika</strong> – im Hochparterre des Haupthauses</li>
-        <li><strong>Sommerwind</strong> – mit Dachterrasse im Haupthaus</li>
+        <li><a href="/zwergenfee/"><strong>Zwergenfee</strong></a> – im Anbau</li>
+        <li><a href="/loft/"><strong>Loft</strong></a> – im Souterrain</li>
+        <li><a href="/romantika/"><strong>Romantika</strong></a> – im Hochparterre des Haupthauses</li>
+        <li><a href="/sommerwind/"><strong>Sommerwind</strong></a> – mit Dachterrasse im Haupthaus</li>
       </ul>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="related-grid">
+      <a class="related-card" href="/wintervilla/">
+        <h3>Die Villa im Winter</h3>
+        <p>Vereiste Küste, Kaminfeuer und stille Spaziergänge – Fehmarn hat auch außerhalb des Sommers seinen Reiz.</p>
+        <span class="related-cta">Wintervilla entdecken →</span>
+      </a>
+      <a class="related-card" href="/sauna-fitness/">
+        <h3>Sauna &amp; Fitness</h3>
+        <p>Eigener Wellnessbereich für unsere Gäste – nach individueller Terminvereinbarung.</p>
+        <span class="related-cta">Mehr erfahren →</span>
+      </a>
     </div>
   </section>
 </Layout>

@@ -1,0 +1,82 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PhotoGallery from '../../components/PhotoGallery.astro';
+import { Image } from 'astro:assets';
+import { getWintervillaImages } from '../../lib/galleries.js';
+import heroWinter from '../../images/wintervilla-hero.jpg';
+
+const galleryImages = getWintervillaImages();
+
+const features = [
+  'Kaminofen & Wandheizung',
+  'Sauna & Fitness',
+  'Highspeed-WLAN',
+  'Ruhige Nebensaison',
+  'Hunde willkommen',
+  'Kurze Wege, leere Strände',
+];
+---
+
+<Layout title="Wintervilla" description="Die Villa Rosengarten im Winter: vereiste Küste, warmes Kaminlicht und Ruhe auf Fehmarn außerhalb der Saison.">
+  <section class="apt-hero">
+    <Image
+      class="apt-hero-img"
+      src={heroWinter}
+      alt="Villa Rosengarten im Winter, beleuchtet im Schnee"
+      widths={[800, 1600, 2200]}
+      sizes="100vw"
+      loading="eager"
+    />
+    <div class="apt-hero-content">
+      <p class="eyebrow">Villa Rosengarten</p>
+      <h1>Die Wintervilla</h1>
+      <p class="apt-hero-sub">Wenn Fehmarn zur Ruhe kommt – Kaminfeuer, Sturmluft und stille Strände.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="apt-section">
+      <ul class="feature-list apt-features">
+        {features.map((f) => <li>{f}</li>)}
+      </ul>
+
+      <p>
+        Fehmarn zeigt im Winter eine ganz andere, ebenso faszinierende Seite:
+        vereiste Steine am Ufer, klare Luft, tiefstehende Sonne über der
+        Ostsee und Strände, auf denen man oft weit und breit allein ist. Wer
+        Wind und Wetter mag, findet hier eine Ruhe, die im Sommer selten zu
+        haben ist – ideal für lange Spaziergänge mit Hund, Sturmbeobachtung
+        an der Steilküste oder einfach ein paar Tage bewusstes Nichtstun.
+      </p>
+      <p>
+        In der Villa selbst wird es dann besonders gemütlich. Kaminofen,
+        warme Wandheizung und dicke Decken sorgen für Behaglichkeit, während
+        draußen der Wind um das Haus geht. Nach einem Spaziergang an der
+        eisigen Küste ist die hauseigene Sauna genau richtig, um wieder
+        aufzuwärmen – und abends lädt der Kamin zum Verweilen ein.
+      </p>
+      <p>
+        Auch für längere Aufenthalte abseits der Hauptsaison ist die Villa
+        bestens geeignet: professionelles High-Speed-WLAN macht sie zum
+        idealen Rückzugsort für Remote Work, während Fehmarn vor der Tür
+        seine winterliche Stille entfaltet. Und wenn abends der Schnee fällt
+        und die Villa im warmen Licht der Gartenbeleuchtung erstrahlt, entsteht
+        eine Atmosphäre, die viele unserer Gäste besonders schätzen.
+      </p>
+    </div>
+  </section>
+
+  {galleryImages.length > 0 && (
+    <section class="wrap">
+      <h2 class="section-title">Impressionen aus dem Winter</h2>
+      <PhotoGallery images={galleryImages} name="Wintervilla" layout="masonry" />
+    </section>
+  )}
+
+  <section class="wrap">
+    <div class="booking-cta">
+      <a class="btn btn-lg" href="/ferienwohnungen/">Wohnungen ansehen</a>
+      <a class="btn btn-ghost-dark" href="/kontakt/">Individuelle Anfrage</a>
+    </div>
+  </section>
+</Layout>

@@ -4,6 +4,7 @@ import ApartmentCard from '../components/ApartmentCard.astro';
 import PhotoGallery from '../components/PhotoGallery.astro';
 import { apartments } from '../data/apartments.js';
 import { getPriceMap, getPriceRange } from '../lib/prices.js';
+import { getImpressionenImages } from '../lib/galleries.js';
 import VideoEmbed from '../components/VideoEmbed.astro';
 import { Image, getImage } from 'astro:assets';
 
@@ -17,14 +18,7 @@ import sauna from '../images/home/sauna.jpg';
 import sundowner from '../images/home/sundowner.jpg';
 import familie from '../images/home/familie.jpg';
 import segeln from '../images/home/segeln.jpg';
-import kitesStrand from '../images/home/kites-strand.jpg';
-import strand from '../images/home/strand.jpg';
 import seebruecke from '../images/home/seebruecke.jpg';
-import schwaene from '../images/home/schwaene.jpg';
-import villaAussen from '../images/home/villa-aussen.jpg';
-import sonnenuntergang from '../images/home/sonnenuntergang.jpg';
-import raps from '../images/home/raps.jpg';
-import galloways from '../images/home/galloways.jpg';
 
 // Große Hintergrundbilder für Hero & Band (als CSS-fähige URLs).
 const heroBg = await getImage({ src: heroVilla, width: 2200, format: 'webp' });
@@ -34,7 +28,7 @@ const experiences = [
   { img: kiteAction, title: 'Kiten & Wassersport', text: 'Direkt vor der Tür: einer der besten Kite- und Surfspots der Ostsee.' },
   { img: hundStrand, title: 'Strand & Hunde willkommen', text: 'Kilometerlange Strände – und der Vierbeiner darf mit.' },
   { img: familie, title: 'Zeit für die Familie', text: 'Viel Platz, kurze Wege, Spielzeug in den Wohnungen – ideal für Groß und Klein.' },
-  { img: sauna, title: 'Sauna & Fitness', text: 'Eigene Sauna und Fitnessbereich, individuell buchbar.' },
+  { img: sauna, title: 'Sauna & Fitness', text: 'Eigene Sauna und Fitnessbereich, individuell buchbar.', href: '/sauna-fitness/' },
   { img: segeln, title: 'Segeln & Meer', text: 'Hafen, Segelreviere und Ausflüge über die ganze Insel.' },
   { img: sundowner, title: 'Genuss & Sundowner', text: 'Restaurants und Bars der Burger Altstadt nur wenige Schritte entfernt.' },
 ];
@@ -55,11 +49,7 @@ const distances = [
   { value: '90 km', label: 'Flughafen' },
 ];
 
-const impressionen = [
-  kitesStrand, sonnenuntergang, hundStrand, raps,
-  schwaene, strand, galloways, segeln,
-  seebruecke, sundowner,
-];
+const impressionen = getImpressionenImages();
 ---
 
 <Layout title="Startseite" description="Villa Rosengarten – vier hochwertige Ferienwohnungen in Burg auf Fehmarn. Kiten, Strand, Sauna, hundefreundlich. Jetzt Verfügbarkeit prüfen und direkt buchen.">
@@ -101,15 +91,18 @@ const impressionen = [
       zum Ausspannen und Genießen.
     </p>
     <div class="experience-grid">
-      {experiences.map((e) => (
-        <article class="exp-tile reveal">
-          <Image src={e.img} alt={e.title} widths={[400, 800]} sizes="(max-width:700px) 90vw, 380px" loading="lazy" />
-          <div class="exp-caption">
-            <h3>{e.title}</h3>
-            <p>{e.text}</p>
-          </div>
-        </article>
-      ))}
+      {experiences.map((e) => {
+        const Tag = e.href ? 'a' : 'article';
+        return (
+          <Tag class="exp-tile reveal" href={e.href}>
+            <Image src={e.img} alt={e.title} widths={[400, 800]} sizes="(max-width:700px) 90vw, 380px" loading="lazy" />
+            <div class="exp-caption">
+              <h3>{e.title}</h3>
+              <p>{e.text}</p>
+            </div>
+          </Tag>
+        );
+      })}
     </div>
   </section>
 
@@ -161,7 +154,7 @@ const impressionen = [
   <section class="wrap">
     <h2 class="section-title reveal">Impressionen</h2>
     <p class="section-lead reveal">Insel, Strand und Meer – ein paar Eindrücke von Fehmarn.</p>
-    <PhotoGallery images={impressionen} name="Villa Rosengarten & Fehmarn" minTile={240} cols={{ desktop: 5, mobile: 2 }} />
+    <PhotoGallery images={impressionen} name="Villa Rosengarten & Fehmarn" layout="masonry" />
   </section>
 
   <!-- ABSCHLUSS-CTA -->

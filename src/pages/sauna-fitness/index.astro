@@ -1,0 +1,77 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PhotoGallery from '../../components/PhotoGallery.astro';
+import { Image } from 'astro:assets';
+import { getSaunaFitnessImages } from '../../lib/galleries.js';
+import heroSauna from '../../images/sauna-fitness-hero.jpg';
+
+const galleryImages = getSaunaFitnessImages();
+
+const features = [
+  'Finnische Sauna',
+  'Fitnessbereich mit Hanteln & Boxsack',
+  'Ruhe- und Loungebereich',
+  'Individuelle Terminvereinbarung',
+  'Für alle Gäste der Villa',
+];
+---
+
+<Layout title="Sauna & Fitness" description="Der eigene Wellness- und Fitnessbereich der Villa Rosengarten: finnische Sauna und Fitnessecke, für unsere Gäste nach Terminvereinbarung.">
+  <section class="apt-hero">
+    <Image
+      class="apt-hero-img"
+      src={heroSauna}
+      alt="Finnische Sauna in der Villa Rosengarten"
+      widths={[800, 1600, 2200]}
+      sizes="100vw"
+      loading="eager"
+    />
+    <div class="apt-hero-content">
+      <p class="eyebrow">Villa Rosengarten</p>
+      <h1>Sauna &amp; Fitness</h1>
+      <p class="apt-hero-sub">Der eigene Wellnessbereich der Villa – Entspannung nach einem Tag am Meer.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="apt-section">
+      <ul class="feature-list apt-features">
+        {features.map((f) => <li>{f}</li>)}
+      </ul>
+
+      <p>
+        Im Dachgeschoss der Villa steht unseren Gästen ein eigener kleiner
+        Wellness- und Fitnessbereich zur Verfügung. Unter dem offenen
+        Dachstuhl mit sichtbaren Holzbalken laden zwei Liegen zum Entspannen
+        ein – der ideale Ort, um nach einem langen Strandtag oder einer
+        Runde Kiten zur Ruhe zu kommen.
+      </p>
+      <p>
+        Die finnische Sauna sorgt für wohlige Wärme und Entspannung für
+        Körper und Geist. Nebenan steht ein kleiner Fitnessbereich mit
+        Boxsack, Hantelbank und Trainingsmatten bereit, für alle, die auch
+        im Urlaub nicht auf ihr Training verzichten möchten.
+      </p>
+      <p>
+        Sauna und Fitnessbereich stehen allen Gästen der Villa Rosengarten
+        nach individueller Terminvereinbarung zur Verfügung. Sprechen Sie uns
+        gerne während Ihres Aufenthalts an oder schreiben Sie uns vorab über
+        das Kontaktformular.
+      </p>
+    </div>
+  </section>
+
+  {galleryImages.length > 0 && (
+    <section class="wrap">
+      <h2 class="section-title">Impressionen</h2>
+      <PhotoGallery images={galleryImages} name="Sauna & Fitness" layout="masonry" />
+    </section>
+  )}
+
+  <section class="wrap">
+    <div class="booking-cta">
+      <a class="btn btn-lg" href="/ferienwohnungen/">Wohnungen ansehen</a>
+      <a class="btn btn-ghost-dark" href="/kontakt/">Termin anfragen</a>
+    </div>
+  </section>
+</Layout>

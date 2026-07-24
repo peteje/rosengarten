@@ -9,7 +9,7 @@
 export const apartments = [
   {
     slug: 'romantika',
-    cover: '01-romantika-1',
+    cover: '23-romantika-6',
     name: 'Romantika',
     subtitle: 'Romantika mit Kaminzimmer',
     location: 'Hochparterre im Haupthaus',
@@ -157,7 +157,7 @@ export const apartments = [
   },
   {
     slug: 'zwergenfee',
-    cover: '01-zf-3',
+    cover: '07-zwergenfee',
     name: 'Zwergenfee',
     subtitle: 'Moderne Wohnung im Garten der Anlage',
     location: 'Anbau der Villa',
