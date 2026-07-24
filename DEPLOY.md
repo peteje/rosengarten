@@ -1,9 +1,12 @@
 # Deployment – Villa Rosengarten
 
 **Variante B:** Der Build läuft **lokal** (mit den Smoobu-Preisen), die fertige
-`dist/` wird ins Repo gepusht, und GitHub Actions lädt sie per **rsync über SSH** zu IONOS.
-So bleibt der **Smoobu-Key ausschließlich lokal** – bei GitHub liegen nur die
-FTP-Zugangsdaten.
+`dist/` wird ins Repo gepusht, und GitHub Actions lädt sie per **SFTP (lftp
+mirror)** zu IONOS. So bleibt der **Smoobu-Key ausschließlich lokal** – bei
+GitHub liegen nur die SFTP-Zugangsdaten.
+
+> Der IONOS-Account ist auf reines SFTP beschränkt (rssh, "Allowed commands:
+> sftp") – deshalb SFTP/lftp statt rsync-über-SSH.
 
 Lokal muss **kein Node** installiert sein – alles läuft über Docker.
 
@@ -12,7 +15,7 @@ Lokal muss **kein Node** installiert sein – alles läuft über Docker.
    │  Build mit Smoobu-Key (lokal)  →  dist/
    │  git push  (Quelle + dist/)
    ▼
-[GitHub]  Action synct dist/ per rsync/SSH hoch
+[GitHub]  Action synct dist/ per SFTP (lftp mirror) hoch
    ▼
 [IONOS-Webspace]  live
 ```
@@ -54,23 +57,28 @@ Das Repo liegt unter **`github.com/peteje/rosengarten`** (Remote via HTTPS,
 Authentifizierung über den macOS-Schlüsselbund – ohne Passwortabfrage).
 
 ### 4. GitHub-Secrets für den IONOS-Upload
-Der Upload läuft per **rsync über SSH** (Passwort-Auth, wie bei der
-energieteam-fehmarn-Seite). Im Repo: **Settings → Secrets and variables →
-Actions → New repository secret**. Nur die SSH-Zugangsdaten (kein Smoobu!):
+Der Upload läuft per **SFTP** (Passwort-Auth, via `lftp mirror`). Im Repo:
+**Settings → Secrets and variables → Actions → New repository secret**. Nur
+die SFTP-Zugangsdaten (kein Smoobu!):
 
 | Secret | Wert (dient als …) |
 |---|---|
-| `FTP_SERVER` | IONOS-SSH-Host |
-| `SSL_PORT` | SSH-Port (meist `22`) |
-| `FTP_USERNAME` | IONOS-SSH-Benutzer |
-| `FTP_PASSWORD` | IONOS-SSH-Passwort |
-| `FTP_SERVER_DIR` | Zielordner auf dem Webspace, z. B. `/rosengarten.casa/` |
+| `FTP_SERVER` | IONOS-SFTP-Host |
+| `SSL_PORT` | SFTP-Port (meist `22`) |
+| `FTP_USERNAME` | IONOS-SFTP-Benutzer |
+| `FTP_PASSWORD` | IONOS-SFTP-Passwort |
+| `FTP_SERVER_DIR` | Zielordner **relativ zum SFTP-Root** – siehe Warnung unten |
 
-> Die Namen sind historisch `FTP_*`, die Werte sind aber die **SSH-Zugangsdaten**
-> (rsync läuft über SSH). Auf IONOS-Webspace sind SFTP/SSH- und FTP-Zugang i. d. R.
-> dieselben Zugangsdaten.
+> ⚠️ **Wichtigste Falle: der SFTP-Benutzer ist bei IONOS meist schon auf einen
+> bestimmten Ordner eingesperrt (chroot)**, z. B. auf `/rosengarten/`. In dem
+> Fall ist `FTP_SERVER_DIR` **relativ zu diesem bereits eingeschränkten Root**
+> zu verstehen – der korrekte Wert ist dann einfach **`/`**, NICHT
+> `/rosengarten` (das würde nach `/rosengarten/rosengarten/` hochladen, ein
+> Pfad, den es nicht gibt → `Permission denied`). Im Zweifel im
+> IONOS-Kundencenter unter *Hosting → SFTP-Zugänge* nachsehen, welches
+> Verzeichnis dem Benutzer bereits zugeordnet ist.
 >
-> **Achtung `--delete`:** rsync spiegelt `dist/` exakt in `FTP_SERVER_DIR` –
+> **Achtung `--delete`:** `mirror` spiegelt `dist/` exakt in `FTP_SERVER_DIR` –
 > Dateien im Zielordner, die nicht zur Seite gehören, werden gelöscht.
 > `FTP_SERVER_DIR` muss deshalb auf den **eigenen Rosengarten-Ordner** zeigen,
 > nicht auf einen gemeinsamen Wurzelordner mit anderen Seiten.
@@ -90,6 +98,6 @@ Ab jetzt genügt `./villa.sh deploy "…"`.
   vor dem Push frisch gebaut wird.
 - **Preise aktualisieren**: einfach erneut `./villa.sh deploy` – der Build zieht
   die aktuellen Smoobu-Preise.
-- **IONOS-Zugänge**: SSH/SFTP-Benutzer im IONOS-Kundencenter unter
-  *Hosting → SFTP/SSH-Zugänge*.
+- **IONOS-Zugänge**: SFTP-Benutzer im IONOS-Kundencenter unter
+  *Hosting → SFTP-Zugänge*.
 - **Manuell auslösen**: *Actions → Deploy to IONOS Webspace → Run workflow*.
