@@ -47,7 +47,8 @@ build() {
   # (src/lib/prices.js) – ohne feste Zeitzone würde der UTC-Container-Tag
   # abends/nachts vom lokalen Tag abweichen.
   docker run --rm \
-    -e SMOOBU_API_KEY -e SMOOBU_API_SECRET -e TZ=Europe/Berlin \
+    -e SMOOBU_API_KEY -e SMOOBU_API_SECRET \
+    -e GOOGLE_PLACES_API_KEY -e GOOGLE_PLACE_ID -e TZ=Europe/Berlin \
     -v "$PWD":/app -w /app "$IMAGE" \
     sh -c "npm install && npm run build"
 }
@@ -60,7 +61,8 @@ case "$cmd" in
     docker rm -f "$CONTAINER" >/dev/null 2>&1 || true
     echo "▶ Dev-Server startet auf http://localhost:${PORT}  (Stoppen mit Strg+C)"
     exec docker run --rm -it --name "$CONTAINER" \
-      -e SMOOBU_API_KEY -e SMOOBU_API_SECRET -e TZ=Europe/Berlin \
+      -e SMOOBU_API_KEY -e SMOOBU_API_SECRET \
+      -e GOOGLE_PLACES_API_KEY -e GOOGLE_PLACE_ID -e TZ=Europe/Berlin \
       -v "$PWD":/app -w /app -p "${PORT}:${PORT}" "$IMAGE" \
       sh -c "npm install && npm run dev -- --host 0.0.0.0"
     ;;

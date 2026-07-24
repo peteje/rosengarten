@@ -1263,3 +1263,79 @@ a.exp-tile {
   color: inherit;
   cursor: pointer;
 }
+
+/* --- Bewertungen (Google live + Booking/Airbnb manuell) --- */
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+.review-card {
+  background: #fff;
+  border: 1px solid #eee0d8;
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.review-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.review-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.review-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-sand);
+  color: var(--color-rose-dark);
+  font-weight: 700;
+}
+.review-name {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.review-meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.85rem;
+  color: #8a8078;
+}
+.review-stars {
+  color: var(--color-green);
+  letter-spacing: 1px;
+}
+.review-rating-label {
+  font-weight: 700;
+  color: var(--color-green);
+}
+.review-source {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--color-sand);
+  color: var(--color-rose-dark);
+}
+.review-text {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

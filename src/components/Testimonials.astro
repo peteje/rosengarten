@@ -1,0 +1,58 @@
+---
+// Bewertungs-Sektion: Google-Bewertungen live zur Build-Zeit (offizielle
+// Places API), Booking.com/Airbnb als handverlesene Zitate aus
+// _originale/bewertungen.md (siehe src/lib/reviews.js).
+import { getReviews } from '../lib/reviews.js';
+
+const { google, all } = await getReviews();
+
+const sourceLabel = {
+  google: 'Google',
+  booking: 'Booking.com',
+  airbnb: 'Airbnb',
+};
+---
+
+{all.length > 0 && (
+  <section class="wrap">
+    <h2 class="section-title reveal">Das sagen unsere Gäste</h2>
+    {google.rating && (
+      <p class="section-lead reveal">
+        <strong>{google.rating.toFixed(1).replace('.', ',')} ★</strong> auf Google
+        {google.count ? ` · ${google.count} Bewertungen` : ''}
+        {google.mapsUri && (
+          <> · <a href={google.mapsUri} target="_blank" rel="noopener">alle ansehen →</a></>
+        )}
+      </p>
+    )}
+
+    <div class="review-grid">
+      {all.map((r) => (
+        <div class="review-card reveal">
+          <div class="review-head">
+            {r.photoUri ? (
+              <img class="review-avatar" src={r.photoUri} alt="" loading="lazy" width="40" height="40" />
+            ) : (
+              <span class="review-avatar review-avatar--fallback" aria-hidden="true">{r.name?.[0] ?? '?'}</span>
+            )}
+            <div>
+              <p class="review-name">{r.name}</p>
+              <p class="review-meta">
+                {r.rating ? (
+                  <span class="review-stars" aria-label={`${r.rating} von ${r.ratingMax ?? 5} Sternen`}>
+                    {'★'.repeat(Math.round(r.rating))}{'☆'.repeat((r.ratingMax ?? 5) - Math.round(r.rating))}
+                  </span>
+                ) : (
+                  <span class="review-rating-label">{r.ratingLabel}</span>
+                )}
+                {r.date && <span class="review-date"> · {r.date}</span>}
+              </p>
+            </div>
+            <span class={`review-source review-source--${r.source}`}>{sourceLabel[r.source] ?? r.source}</span>
+          </div>
+          <p class="review-text">{r.text}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+)}

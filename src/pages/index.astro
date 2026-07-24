@@ -6,6 +6,7 @@ import { apartments } from '../data/apartments.js';
 import { getPriceMap, getPriceRange } from '../lib/prices.js';
 import { getImpressionenImages } from '../lib/galleries.js';
 import VideoEmbed from '../components/VideoEmbed.astro';
+import Testimonials from '../components/Testimonials.astro';
 import { Image, getImage } from 'astro:assets';
 
 const priceMap = await getPriceMap();
@@ -156,6 +157,9 @@ const impressionen = getImpressionenImages();
     <p class="section-lead reveal">Insel, Strand und Meer – ein paar Eindrücke von Fehmarn.</p>
     <PhotoGallery images={impressionen} name="Villa Rosengarten & Fehmarn" layout="masonry" />
   </section>
+
+  <!-- BEWERTUNGEN -->
+  <Testimonials />
 
   <!-- ABSCHLUSS-CTA -->
   <section class="cta-band" style={`background-image:url(${heroBg.src})`}>
