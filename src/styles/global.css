@@ -1135,12 +1135,19 @@ form.contact-form textarea {
 }
 
 /* Booking-Tool-Iframe: Smoobus eigene Höhen-Auto-Anpassung (iFrameResizer)
-   antwortet oft nicht rechtzeitig -> Iframe bleibt zu niedrig, der
-   Datepicker-Kalender wird abgeschnitten (scrolling="no" am Iframe selbst).
-   Höhe daher fest überschreiben (!important, da Smoobu die Höhe per Inline-
-   Style setzt, das sonst gewinnen würde). */
+   antwortet oft nicht rechtzeitig, und der Inhalt wechselt stark in der Höhe
+   (kleines Suchformular vs. ausgeklappte Ergebnisliste mit mehreren
+   Wohnungen) -> keine feste Höhe kann für beides passen. Stattdessen: Iframe
+   selbst großzügig hoch (deckt auch die volle Ergebnisliste ab, scrolling="no"
+   am Iframe selbst verhindert eigenes Scrollen), und den sichtbaren Ausschnitt
+   über den Wrapper begrenzen + scrollbar machen. */
+.booking-tool {
+  max-height: 650px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .booking-tool iframe {
-  min-height: 520px !important;
+  min-height: 2200px !important;
 }
 
 /* --- Video-Einbettung (datenschutzfreundliche YouTube-Facade) --- */
