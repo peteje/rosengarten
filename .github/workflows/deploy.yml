@@ -47,4 +47,13 @@ jobs:
           # diesen Ausschluss versucht --delete ihn bei jedem Deploy erneut zu
           # entfernen und scheitert dann mit "Permission denied". Der
           # Ausschluss lässt lftp den Ordner komplett ignorieren.
-          lftp -u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
+          #
+          # --ignore-time: actions/checkout setzt bei JEDEM Lauf alle
+          # Datei-Zeitstempel auf "jetzt" (Git speichert keine mtimes). Ohne
+          # dieses Flag hält lftp deshalb JEDE Datei für geändert (Zeitstempel
+          # weicht immer vom Stand auf dem Server ab) und lädt bei jedem
+          # Deploy alles neu hoch. Mit --ignore-time vergleicht lftp nur noch
+          # die Dateigröße -> unveränderte Dateien (v.a. die vielen Fotos)
+          # werden übersprungen, nur wirklich geänderte Dateien werden
+          # übertragen.
+          lftp -u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --ignore-time --exclude '^rosengarten/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
