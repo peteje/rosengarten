@@ -9,7 +9,7 @@
 export const apartments = [
   {
     slug: 'romantika',
-    cover: '23-romantika-6',
+    cover: '01-hhuez-3',
     name: 'Romantika',
     subtitle: 'Romantika mit Kaminzimmer',
     location: 'Hochparterre im Haupthaus',
