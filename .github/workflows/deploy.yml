@@ -82,7 +82,7 @@ jobs:
             lftp "${BASE_ARGS[@]}" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
           fi
 
-      - name: "deployed"-Tag auf diesen Commit setzen
+      - name: Tag "deployed" auf diesen Commit setzen
         run: |
           git tag -f deployed HEAD
           git push origin refs/tags/deployed --force
