@@ -1310,6 +1310,11 @@ a.exp-tile {
      Karten nebeneinander) statt intern zu scrollen -> letzte Karte wird vom
      Viewport/Wrap abgeschnitten statt per overflow-x erreichbar zu sein. */
   min-width: 0;
+  /* Die letzte Karte ist am rechten Rand meist nur teilweise sichtbar
+     (normal bei einem Karussell) -> Text wird sonst hart mitten im Wort
+     abgeschnitten und wirkt kaputt. Sanft ausblenden statt hart clippen. */
+  mask-image: linear-gradient(to right, black calc(100% - 48px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black calc(100% - 48px), transparent 100%);
 }
 .review-nav {
   flex-shrink: 0;
