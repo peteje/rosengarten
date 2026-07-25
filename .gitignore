@@ -6,6 +6,12 @@ node_modules/
 .villa-secrets.env
 villa-secrets.env
 
+# SMTP-Zugangsdaten fürs Kontaktformular – nie committen (Repo ist
+# öffentlich). Wird vom Deploy-Workflow aus GitHub-Secrets erzeugt und
+# direkt auf den Webspace hochgeladen, siehe public/smtp-config.example.php.
+public/smtp-config.php
+smtp-config.php
+
 # Geheime Umgebungsvariablen (z. B. SMOOBU_API_KEY) – nie committen
 .env
 .env.*

@@ -1,0 +1,52 @@
+#!/usr/bin/env python3
+"""Erzeugt /tmp/smtp-config.php aus den SMTP_*-GitHub-Secrets.
+
+Diese Datei landet NIE im Git-Repo (das Repo ist öffentlich!) -- sie wird
+hier nur transient im CI-Runner geschrieben und im nächsten Workflow-Schritt
+direkt per SFTP auf den Webspace hochgeladen. Siehe public/contact.php und
+public/smtp-config.example.php.
+
+Gibt eine Zeile auf stdout aus:
+  SKIP      kein SMTP_HOST-Secret gesetzt -> nichts zu tun
+  WRITTEN   Datei wurde geschrieben
+"""
+import os
+import sys
+
+OUTPUT_PATH = "/tmp/smtp-config.php"
+
+
+def php_single_quote(s: str) -> str:
+    return "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+
+def main() -> None:
+    host = os.environ.get("SMTP_HOST", "")
+    port = os.environ.get("SMTP_PORT", "")
+    user = os.environ.get("SMTP_USER", "")
+    password = os.environ.get("SMTP_PASSWORD", "")
+
+    if not host:
+        print("SKIP")
+        return
+
+    try:
+        port_int = int(port)
+    except ValueError:
+        print(f"FEHLER: SMTP_PORT ist keine Zahl: {port!r}", file=sys.stderr)
+        sys.exit(1)
+
+    content = (
+        "<?php\n"
+        f"define('SMTP_HOST', {php_single_quote(host)});\n"
+        f"define('SMTP_PORT', {port_int});\n"
+        f"define('SMTP_USER', {php_single_quote(user)});\n"
+        f"define('SMTP_PASSWORD', {php_single_quote(password)});\n"
+    )
+    with open(OUTPUT_PATH, "w") as f:
+        f.write(content)
+    print("WRITTEN")
+
+
+if __name__ == "__main__":
+    main()
