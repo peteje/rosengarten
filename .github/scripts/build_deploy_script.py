@@ -51,6 +51,9 @@ def remote_path(server_dir: str, rel_path: str) -> str:
 
 def main() -> None:
     server_dir = sys.argv[1]
+    ftp_server = os.environ["FTP_SERVER"]
+    ftp_username = os.environ["FTP_USERNAME"]
+    ssl_port = os.environ.get("SSL_PORT") or "22"
     base_ref = "refs/tags/deployed"
 
     if not ref_exists(base_ref):
@@ -100,7 +103,15 @@ def main() -> None:
         print("NOTHING_TO_DO")
         return
 
+    # WICHTIG: -f <scriptfile> lässt sich nicht mit -u/-p/<site> auf der
+    # lftp-Kommandozeile kombinieren ("-c, -f, -v, -h conflict with other
+    # `open' options and arguments") -- deshalb steht der open-Befehl (samt
+    # Zugangsdaten über die LFTP_PASSWORD-Umgebungsvariable, nie im Skript-
+    # text selbst) als erste Zeile im Skript, lftp wird dann nur mit -f
+    # aufgerufen.
+    open_url = f"sftp://{ftp_server}"
     lines = [
+        f"open --env-password -u {lftp_quote(ftp_username)} -p {ssl_port} {lftp_quote(open_url)};",
         "set sftp:auto-confirm yes;",
         "set net:timeout 20;",
         "set net:max-retries 2;",
