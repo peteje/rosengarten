@@ -66,7 +66,16 @@ $headers = [
     'X-Mailer: PHP/' . phpversion(),
 ];
 
+// error_get_last() greift bei mail()-Fehlern oft ins Leere (viele Hoster
+// unterdrücken die Warnung je nach php.ini). Deshalb die Warnung, die
+// mail() intern per trigger_error() auslöst, direkt selbst abfangen.
+$mailWarning = null;
+set_error_handler(function ($errno, $errstr) use (&$mailWarning) {
+    $mailWarning = $errstr;
+    return true;
+});
 $sent = mail($to, $subject, $body, implode("\r\n", $headers));
+restore_error_handler();
 
 if ($sent) {
     header('Location: /kontakt/danke/');
@@ -75,11 +84,13 @@ if ($sent) {
     // sonst blind wären. mail-error.log liegt neben contact.php im
     // Webspace-Root, ist aber per .htaccess (FilesMatch \.log$) vor
     // öffentlichem HTTP-Zugriff gesperrt -> nur per FTP/SFTP einsehbar.
-    $error = error_get_last();
     $line = sprintf(
-        "[%s] mail() lieferte false. Letzter PHP-Fehler: %s\n",
+        "[%s] mail() lieferte false. PHP-Warnung: %s | mail()-Funktion vorhanden: %s | sendmail_path: %s | PHP-Version: %s\n",
         date('Y-m-d H:i:s'),
-        $error['message'] ?? '(keiner)'
+        $mailWarning ?? '(keine Warnung ausgelöst)',
+        function_exists('mail') ? 'ja' : 'nein',
+        ini_get('sendmail_path') ?: '(leer)',
+        phpversion()
     );
     @file_put_contents(__DIR__ . '/mail-error.log', $line, FILE_APPEND);
     redirect_error('send');
