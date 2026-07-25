@@ -3,8 +3,15 @@ name: Deploy to IONOS Webspace
 # Es wird NICHT gebaut: die fertige dist/ kommt bereits fertig aus dem Repo
 # (lokal mit den Smoobu-Preisen gebaut, siehe villa.sh / DEPLOY.md).
 #
-# Upload per SFTP mit lftp (mirror). Der IONOS-Webspace-Zugang ist auf SFTP
+# Upload per SFTP mit lftp. Der IONOS-Webspace-Zugang ist auf SFTP
 # beschränkt (rssh, "Allowed commands: sftp") – deshalb SFTP statt rsync/SSH.
+#
+# Nur die tatsächlich geänderten Dateien werden übertragen (echter Git-Diff,
+# siehe .github/scripts/build_deploy_script.py) statt bei jedem Lauf alles
+# neu hochzuladen. Vergleichsbasis ist der Tag "deployed", der nach jedem
+# erfolgreichen Deploy auf den ausgelieferten Commit weitergesetzt wird –
+# so werden auch Änderungen aus einem fehlgeschlagenen vorherigen Versuch
+# beim nächsten Mal zuverlässig nachgeholt.
 #
 # Genutzte Repo-Secrets (Namen wie eingerichtet):
 #   FTP_SERVER      -> SFTP-Host
@@ -21,39 +28,61 @@ concurrency:
   group: deploy-ionos
   cancel-in-progress: true
 
+permissions:
+  contents: write # zum Weitersetzen des "deployed"-Tags nach erfolgreichem Deploy
+
 jobs:
   deploy:
-    name: Deploy per SFTP (lftp mirror)
+    name: Deploy per SFTP (lftp, nur geänderte Dateien)
     runs-on: ubuntu-latest
     steps:
       - name: Code auschecken
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # volle Historie + Tags nötig für den Diff gegen "deployed"
 
       - name: lftp installieren
         run: sudo apt-get update && sudo apt-get install -y lftp
 
+      - name: Deploy-Skript erzeugen (Diff gegen letzten erfolgreichen Deploy)
+        id: plan
+        env:
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+        run: |
+          RESULT=$(python3 .github/scripts/build_deploy_script.py "$FTP_SERVER_DIR")
+          echo "Ergebnis: $RESULT"
+          echo "result=$RESULT" >> "$GITHUB_OUTPUT"
+
       - name: Auf IONOS Webspace synchronisieren (SFTP)
+        if: ${{ !startsWith(steps.plan.outputs.result, 'NOTHING_TO_DO') }}
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
           SSL_PORT: ${{ secrets.SSL_PORT }}
           FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
           FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
           FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          PLAN_RESULT: ${{ steps.plan.outputs.result }}
         run: |
           export LFTP_PASSWORD="$FTP_PASSWORD"
-          # --exclude '^rosengarten/': auf dem Webspace liegt (aus der alten
-          # Chroot-Doppelpfad-Verwechslung) noch ein verwaister Ordner
-          # "rosengarten/", den dieser SFTP-Account nicht löschen darf. Ohne
-          # diesen Ausschluss versucht --delete ihn bei jedem Deploy erneut zu
-          # entfernen und scheitert dann mit "Permission denied". Der
-          # Ausschluss lässt lftp den Ordner komplett ignorieren.
-          #
-          # --ignore-time: actions/checkout setzt bei JEDEM Lauf alle
-          # Datei-Zeitstempel auf "jetzt" (Git speichert keine mtimes). Ohne
-          # dieses Flag hält lftp deshalb JEDE Datei für geändert (Zeitstempel
-          # weicht immer vom Stand auf dem Server ab) und lädt bei jedem
-          # Deploy alles neu hoch. Mit --ignore-time vergleicht lftp nur noch
-          # die Dateigröße -> unveränderte Dateien (v.a. die vielen Fotos)
-          # werden übersprungen, nur wirklich geänderte Dateien werden
-          # übertragen.
-          lftp -u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --ignore-time --exclude '^rosengarten/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
+          BASE_ARGS=(-u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER")
+
+          if [[ "$PLAN_RESULT" == SCRIPT_READY* ]]; then
+            echo "Übertrage nur geänderte Dateien laut Git-Diff..."
+            lftp "${BASE_ARGS[@]}" -f /tmp/lftp-deploy.txt
+          else
+            # FULL_MIRROR (kein "deployed"-Tag vorhanden, z.B. beim allerersten
+            # Deploy) oder unerwartete Ausgabe -> sicherer vollständiger Mirror.
+            #
+            # --exclude '^rosengarten/': auf dem Webspace liegt (aus der alten
+            # Chroot-Doppelpfad-Verwechslung) noch ein verwaister Ordner
+            # "rosengarten/", den dieser SFTP-Account nicht löschen darf. Ohne
+            # diesen Ausschluss versucht --delete ihn bei jedem Deploy erneut
+            # zu entfernen und scheitert dann mit "Permission denied".
+            echo "Vollständiger Mirror ($PLAN_RESULT)..."
+            lftp "${BASE_ARGS[@]}" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
+          fi
+
+      - name: "deployed"-Tag auf diesen Commit setzen
+        run: |
+          git tag -f deployed HEAD
+          git push origin refs/tags/deployed --force

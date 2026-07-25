@@ -85,12 +85,15 @@ if ($sent) {
     // Webspace-Root, ist aber per .htaccess (FilesMatch \.log$) vor
     // öffentlichem HTTP-Zugriff gesperrt -> nur per FTP/SFTP einsehbar.
     $line = sprintf(
-        "[%s] mail() lieferte false. PHP-Warnung: %s | mail()-Funktion vorhanden: %s | sendmail_path: %s | PHP-Version: %s\n",
+        "[%s] mail() lieferte false. PHP-Warnung: %s | mail()-Funktion vorhanden: %s | sendmail_path: %s | PHP-Version: %s | disable_functions: %s | open_basedir: %s | error_log: %s\n",
         date('Y-m-d H:i:s'),
         $mailWarning ?? '(keine Warnung ausgelöst)',
         function_exists('mail') ? 'ja' : 'nein',
         ini_get('sendmail_path') ?: '(leer)',
-        phpversion()
+        phpversion(),
+        ini_get('disable_functions') ?: '(keine)',
+        ini_get('open_basedir') ?: '(keine)',
+        ini_get('error_log') ?: '(Standard/leer)'
     );
     @file_put_contents(__DIR__ . '/mail-error.log', $line, FILE_APPEND);
     redirect_error('send');
