@@ -22,23 +22,11 @@ const url = apartmentId
 
 const initJson = JSON.stringify({ url, baseUrl: 'https://login.smoobu.com', target: `#${targetId}` });
 
-// BookingToolIframe.js lädt intern eine Kette weiterer Skripte (jQuery u.a.)
-// nach – ruft man initialize() direkt im Anschluss auf (wie im offiziellen
-// Smoobu-Snippet), verliert das bei langsamerer Verbindung das Wettrennen und
-// bleibt lautlos leer. Deshalb: alle 1,5s erneut versuchen, bis das Ziel-Div
-// gefüllt ist (max. 15s, danach aufgeben – Skript bleibt sonst evtl. blockiert).
-const initScript = `
-  (function () {
-    var tries = 0;
-    var timer = setInterval(function () {
-      tries++;
-      var el = document.querySelector('#${targetId}');
-      if (el && el.children.length > 0) { clearInterval(timer); return; }
-      if (tries > 10) { clearInterval(timer); return; }
-      try { BookingToolIframe.initialize(${initJson}); } catch (e) {}
-    }, 1500);
-  })();
-`;
+// Exakt der offizielle Smoobu-Snippet-Aufruf, unverändert (ein einziger
+// Aufruf) – ein früherer Versuch mit wiederholten Retry-Aufrufen hat das
+// Widget zuverlässig kaputt gemacht (vermutlich Konflikt durch mehrfach
+// nachgeladene Abhängigkeiten), sichtbar live als dauerhaft leere Box.
+const initScript = `BookingToolIframe.initialize(${initJson});`;
 ---
 
 <div class="smoobu-calendar booking-tool">
