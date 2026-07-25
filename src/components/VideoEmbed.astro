@@ -118,7 +118,8 @@ const { id, title = 'Video abspielen' } = Astro.props;
 
   document.querySelectorAll('.video-embed[data-yt]').forEach((el) => {
     const btn = el.querySelector('.video-facade');
-    if (!btn) return;
+    const id = el.getAttribute('data-yt');
+    if (!btn || !id) return;
     // Vorladen, sobald der Nutzer Interesse zeigt -> beim Klick sofort bereit
     let preloaded = false;
     const preload = () => {
@@ -129,6 +130,18 @@ const { id, title = 'Video abspielen' } = Astro.props;
     };
     btn.addEventListener('pointerenter', preload);
     btn.addEventListener('focus', preload);
-    btn.addEventListener('click', () => startPlayer(el));
+    btn.addEventListener('click', () => {
+      // Ohne vorheriges Hover/Fokus (z. B. Tap auf Touch-Geräten ohne
+      // Hover-Event) ist die IFrame-API beim Klick meist noch nicht geladen.
+      // Statt bis zu 2,5s auf sie zu warten (wirkt wie "reagiert nicht",
+      // Nutzer klickt ein zweites Mal), sofort den direkten Autoplay-Iframe
+      // einsetzen -> startet garantiert aus genau dieser Klick-Geste heraus.
+      if (ytApiReady()) {
+        startPlayer(el);
+      } else {
+        fallbackIframe(el, id);
+        loadYtApi();
+      }
+    });
   });
 </script>

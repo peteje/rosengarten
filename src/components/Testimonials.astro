@@ -26,33 +26,61 @@ const sourceLabel = {
       </p>
     )}
 
-    <div class="review-grid">
-      {all.map((r) => (
-        <div class="review-card reveal">
-          <div class="review-head">
-            {r.photoUri ? (
-              <img class="review-avatar" src={r.photoUri} alt="" loading="lazy" width="40" height="40" />
-            ) : (
-              <span class="review-avatar review-avatar--fallback" aria-hidden="true">{r.name?.[0] ?? '?'}</span>
-            )}
-            <div>
-              <p class="review-name">{r.name}</p>
-              <p class="review-meta">
-                {r.rating ? (
-                  <span class="review-stars" aria-label={`${r.rating} von ${r.ratingMax ?? 5} Sternen`}>
-                    {'★'.repeat(Math.round(r.rating))}{'☆'.repeat((r.ratingMax ?? 5) - Math.round(r.rating))}
-                  </span>
-                ) : (
-                  <span class="review-rating-label">{r.ratingLabel}</span>
-                )}
-                {r.date && <span class="review-date"> · {r.date}</span>}
-              </p>
+    <div class="review-carousel reveal">
+      <button class="review-nav review-prev" type="button" data-review-prev aria-label="Vorherige Bewertung">&#8249;</button>
+      <div class="review-grid" data-review-track>
+        {all.map((r) => (
+          <div class="review-card">
+            {r.photoUrl ? (
+              <img class="review-photo" src={r.photoUrl} alt="" loading="lazy" width="400" height="220" />
+            ) : r.source === 'booking' ? (
+              <div class="review-photo review-photo--booking" aria-hidden="true">B</div>
+            ) : null}
+            <div class="review-head">
+              {r.photoUri ? (
+                <img class="review-avatar" src={r.photoUri} alt="" loading="lazy" width="40" height="40" />
+              ) : (
+                <span class="review-avatar review-avatar--fallback" aria-hidden="true">{r.name?.[0] ?? '?'}</span>
+              )}
+              <div>
+                <p class="review-name">{r.name}</p>
+                <p class="review-meta">
+                  {r.rating ? (
+                    <span class="review-stars" aria-label={`${r.rating} von ${r.ratingMax ?? 5} Sternen`}>
+                      {'★'.repeat(Math.round(r.rating))}{'☆'.repeat((r.ratingMax ?? 5) - Math.round(r.rating))}
+                    </span>
+                  ) : (
+                    <span class="review-rating-label">{r.ratingLabel}</span>
+                  )}
+                  {r.date && <span class="review-date"> · {r.date}</span>}
+                </p>
+              </div>
+              <span class={`review-source review-source--${r.source}`}>{sourceLabel[r.source] ?? r.source}</span>
             </div>
-            <span class={`review-source review-source--${r.source}`}>{sourceLabel[r.source] ?? r.source}</span>
+            <p class="review-text">{r.text}</p>
           </div>
-          <p class="review-text">{r.text}</p>
-        </div>
-      ))}
+        ))}
+      </div>
+      <button class="review-nav review-next" type="button" data-review-next aria-label="Nächste Bewertung">&#8250;</button>
     </div>
   </section>
 )}
+
+<script>
+  // Karussell: horizontales Scroll-Snap, Pfeile scrollen um eine Kartenbreite.
+  document.querySelectorAll('[data-review-track]').forEach((trackEl) => {
+    const track = trackEl as HTMLElement;
+    const wrap = track.closest('.review-carousel');
+    const prev = wrap?.querySelector('[data-review-prev]');
+    const next = wrap?.querySelector('[data-review-next]');
+
+    const scrollByCard = (dir: number) => {
+      const card = track.querySelector('.review-card') as HTMLElement | null;
+      const amount = card ? card.getBoundingClientRect().width + 20 : 300;
+      track.scrollBy({ left: dir * amount, behavior: 'smooth' });
+    };
+
+    prev?.addEventListener('click', () => scrollByCard(-1));
+    next?.addEventListener('click', () => scrollByCard(1));
+  });
+</script>

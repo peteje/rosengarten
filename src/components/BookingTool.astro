@@ -1,0 +1,48 @@
+---
+// Smoobu "Booking Tool"-Widget (offizieller Iframe-Embed).
+// Ohne apartmentId: Widget für ALLE Wohnungen gemeinsam (kontoweit).
+// Mit apartmentId (= dieselbe Smoobu-Wohnungs-ID wie apt.smoobuId für den
+// Belegungskalender): auf genau diese Wohnung vorausgewähltes Widget – im
+// Smoobu-Dashboard unter "In Webseite integrieren" per Unterkunfts-Auswahl
+// erzeugt, erkennbar an der URL .../iframe/350089/{apartmentId}.
+//
+// Ersetzt den bisherigen externen Link auf https://9a350089.smoobu.net/...
+// (dort kam es zu 503-Fehlern) durch eine direkte, zuverlässige Einbettung
+// über login.smoobu.com – CSP in public/.htaccess erlaubt diese Domain
+// bereits (script-src, frame-src, connect-src, style-src, font-src).
+interface Props {
+  apartmentId?: string;
+}
+const { apartmentId } = Astro.props;
+
+const targetId = apartmentId ? `apartmentIframe${apartmentId}` : 'apartmentIframeAll';
+const url = apartmentId
+  ? `https://login.smoobu.com/de/booking-tool/iframe/350089/${apartmentId}`
+  : 'https://login.smoobu.com/de/booking-tool/iframe/350089';
+
+const initJson = JSON.stringify({ url, baseUrl: 'https://login.smoobu.com', target: `#${targetId}` });
+
+// BookingToolIframe.js lädt intern eine Kette weiterer Skripte (jQuery u.a.)
+// nach – ruft man initialize() direkt im Anschluss auf (wie im offiziellen
+// Smoobu-Snippet), verliert das bei langsamerer Verbindung das Wettrennen und
+// bleibt lautlos leer. Deshalb: alle 1,5s erneut versuchen, bis das Ziel-Div
+// gefüllt ist (max. 15s, danach aufgeben – Skript bleibt sonst evtl. blockiert).
+const initScript = `
+  (function () {
+    var tries = 0;
+    var timer = setInterval(function () {
+      tries++;
+      var el = document.querySelector('#${targetId}');
+      if (el && el.children.length > 0) { clearInterval(timer); return; }
+      if (tries > 10) { clearInterval(timer); return; }
+      try { BookingToolIframe.initialize(${initJson}); } catch (e) {}
+    }, 1500);
+  })();
+`;
+---
+
+<div class="smoobu-calendar booking-tool">
+  <div id={targetId}></div>
+  <script is:inline type="text/javascript" src="https://login.smoobu.com/js/Settings/BookingToolIframe.js"></script>
+  <script is:inline type="text/javascript" set:html={initScript} />
+</div>
