@@ -83,7 +83,27 @@ die SFTP-Zugangsdaten (kein Smoobu!):
 > `FTP_SERVER_DIR` muss deshalb auf den **eigenen Rosengarten-Ordner** zeigen,
 > nicht auf einen gemeinsamen Wurzelordner mit anderen Seiten.
 
-### 5. Fertig
+### 5. GitHub-Secrets fürs Kontaktformular (SMTP)
+`public/contact.php` verschickt Anfragen per SMTP (PHPMailer) statt über
+PHP `mail()` – auf diesem IONOS-Webspace lieferte `mail()` zuverlässig
+`false`, ohne jede PHP-Warnung (typisches Zeichen einer Infrastruktur-
+seitigen Sandbox, die den lokalen `sendmail`-Aufruf unterbindet).
+
+| Secret | Wert (dient als …) |
+|---|---|
+| `SMTP_HOST` | SMTP-Server des Postfachs (z. B. `smtp.ionos.com`) |
+| `SMTP_PORT` | `465` (SSL/TLS) oder `587` (STARTTLS) |
+| `SMTP_USER` | Postfach-Adresse zum Einloggen |
+| `SMTP_PASSWORD` | Postfach-Passwort |
+
+Diese vier Secrets sind **optional**: Der Deploy-Workflow erzeugt daraus bei
+jedem Lauf `smtp-config.php` und lädt sie direkt auf den Webspace hoch
+(landet **nie** im Git-Repo – das Repo ist öffentlich). Ohne gesetzte
+Secrets bleibt eine bereits vorhandene `smtp-config.php` auf dem Webspace
+unverändert; ist noch keine vorhanden, loggt `contact.php` das klar in
+`mail-error.log` statt lautlos zu scheitern.
+
+### 6. Fertig
 Ab jetzt genügt `./villa.sh deploy "…"`.
 
 ---
