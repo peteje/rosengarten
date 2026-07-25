@@ -319,6 +319,17 @@ form.contact-form textarea {
   resize: vertical;
 }
 
+form.contact-form input.field-invalid {
+  border-color: #c0392b;
+  outline-color: #c0392b;
+}
+
+form.contact-form .field-error {
+  margin: -0.4rem 0 0;
+  font-size: 0.85rem;
+  color: #c0392b;
+}
+
 .legal-content {
   max-width: 720px;
   margin: 0 auto;
@@ -1295,6 +1306,10 @@ a.exp-tile {
   -webkit-overflow-scrolling: touch;
   padding: 0.25rem 0.1rem 1rem;
   scrollbar-width: thin;
+  /* Ohne min-width:0 respektiert ein Flex-Kind seine Inhaltsbreite (alle
+     Karten nebeneinander) statt intern zu scrollen -> letzte Karte wird vom
+     Viewport/Wrap abgeschnitten statt per overflow-x erreichbar zu sein. */
+  min-width: 0;
 }
 .review-nav {
   flex-shrink: 0;

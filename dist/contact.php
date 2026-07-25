@@ -71,6 +71,17 @@ $sent = mail($to, $subject, $body, implode("\r\n", $headers));
 if ($sent) {
     header('Location: /kontakt/danke/');
 } else {
+    // Diagnose-Log, da mail() auf IONOS bisher immer false liefert und wir
+    // sonst blind wären. mail-error.log liegt neben contact.php im
+    // Webspace-Root, ist aber per .htaccess (FilesMatch \.log$) vor
+    // öffentlichem HTTP-Zugriff gesperrt -> nur per FTP/SFTP einsehbar.
+    $error = error_get_last();
+    $line = sprintf(
+        "[%s] mail() lieferte false. Letzter PHP-Fehler: %s\n",
+        date('Y-m-d H:i:s'),
+        $error['message'] ?? '(keiner)'
+    );
+    @file_put_contents(__DIR__ . '/mail-error.log', $line, FILE_APPEND);
     redirect_error('send');
 }
 exit;
