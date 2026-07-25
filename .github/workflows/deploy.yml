@@ -19,7 +19,7 @@ name: Deploy to IONOS Webspace
 #   FTP_USERNAME    -> SFTP-Benutzer
 #   FTP_PASSWORD    -> SFTP-Passwort
 #   FTP_SERVER_DIR  -> Zielordner auf dem Webspace
-#   SMTP_HOST       -> SMTP-Server fürs Kontaktformular (z.B. smtp.ionos.com)
+#   SMTP_HOST       -> SMTP-Server fürs Kontaktformular (z.B. smtp.ionos.de)
 #   SMTP_PORT       -> SMTP-Port (465 = SSL/TLS, 587 = STARTTLS)
 #   SMTP_USER       -> Postfach-Adresse zum Einloggen
 #   SMTP_PASSWORD   -> Postfach-Passwort

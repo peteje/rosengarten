@@ -91,7 +91,7 @@ seitigen Sandbox, die den lokalen `sendmail`-Aufruf unterbindet).
 
 | Secret | Wert (dient als …) |
 |---|---|
-| `SMTP_HOST` | SMTP-Server des Postfachs (z. B. `smtp.ionos.com`) |
+| `SMTP_HOST` | SMTP-Server des Postfachs (z. B. `smtp.ionos.de`) |
 | `SMTP_PORT` | `465` (SSL/TLS) oder `587` (STARTTLS) |
 | `SMTP_USER` | Postfach-Adresse zum Einloggen |
 | `SMTP_PASSWORD` | Postfach-Passwort |

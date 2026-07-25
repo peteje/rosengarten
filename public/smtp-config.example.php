@@ -11,7 +11,7 @@
  * neues Passwort): die GitHub-Secrets aktualisieren, nicht diese Datei.
  */
 
-define('SMTP_HOST', 'smtp.ionos.com');
+define('SMTP_HOST', 'smtp.ionos.de');
 define('SMTP_PORT', 465);
 define('SMTP_USER', 'webmaster@rosengarten.casa');
 define('SMTP_PASSWORD', '...');
