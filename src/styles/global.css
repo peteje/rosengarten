@@ -1134,6 +1134,15 @@ form.contact-form textarea {
   min-height: 120px;
 }
 
+/* Booking-Tool-Iframe: Smoobus eigene Höhen-Auto-Anpassung (iFrameResizer)
+   antwortet oft nicht rechtzeitig -> Iframe bleibt zu niedrig, der
+   Datepicker-Kalender wird abgeschnitten (scrolling="no" am Iframe selbst).
+   Höhe daher fest überschreiben (!important, da Smoobu die Höhe per Inline-
+   Style setzt, das sonst gewinnen würde). */
+.booking-tool iframe {
+  min-height: 520px !important;
+}
+
 /* --- Video-Einbettung (datenschutzfreundliche YouTube-Facade) --- */
 .video-wrap {
   max-width: 880px;
