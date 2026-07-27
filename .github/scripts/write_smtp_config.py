@@ -25,6 +25,7 @@ def main() -> None:
     port = os.environ.get("SMTP_PORT", "")
     user = os.environ.get("SMTP_USER", "")
     password = os.environ.get("SMTP_PASSWORD", "")
+    turnstile_secret = os.environ.get("TURNSTILE_SECRET_KEY", "")
 
     if not host:
         print("SKIP")
@@ -42,6 +43,7 @@ def main() -> None:
         f"define('SMTP_PORT', {port_int});\n"
         f"define('SMTP_USER', {php_single_quote(user)});\n"
         f"define('SMTP_PASSWORD', {php_single_quote(password)});\n"
+        f"define('TURNSTILE_SECRET_KEY', {php_single_quote(turnstile_secret)});\n"
     )
     with open(OUTPUT_PATH, "w") as f:
         f.write(content)

@@ -12,7 +12,8 @@
  * PHPMailer liegt als Bibliothek unter vendor/phpmailer/ (manuell besorgt,
  * kein Composer nötig – siehe vendor/phpmailer/README-QUELLE.txt).
  *
- * SMTP-Zugangsdaten stehen NICHT hier im Code (dieses Repo ist öffentlich!),
+ * SMTP-Zugangsdaten (und der Cloudflare-Turnstile-Secret-Key fürs
+ * Spam-Schutz) stehen NICHT hier im Code (dieses Repo ist öffentlich!),
  * sondern in smtp-config.php im selben Ordner. Diese Datei wird vom
  * Deploy-Workflow aus GitHub-Secrets erzeugt und direkt auf den Webspace
  * hochgeladen – sie ist nie Teil des Git-Repos (siehe .gitignore) und wird
@@ -42,6 +43,29 @@ function log_line(string $message): void {
     // .htaccess (FilesMatch \.log$) vor öffentlichem HTTP-Zugriff gesperrt.
     $line = sprintf("[%s] %s\n", date('Y-m-d H:i:s'), $message);
     @file_put_contents(__DIR__ . '/mail-error.log', $line, FILE_APPEND);
+}
+
+// Prüft das Turnstile-Token serverseitig bei Cloudflare (der Client kann das
+// Token nicht selbst fälschen -- die Prüfung MUSS serverseitig passieren).
+function verify_turnstile(string $token, string $secret, string $remoteIp): bool {
+    if ($token === '') return false;
+    $payload = http_build_query([
+        'secret' => $secret,
+        'response' => $token,
+        'remoteip' => $remoteIp,
+    ]);
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n",
+            'content' => $payload,
+            'timeout' => 10,
+        ],
+    ]);
+    $result = @file_get_contents('https://challenges.cloudflare.com/turnstile/v0/siteverify', false, $context);
+    if ($result === false) return false;
+    $data = json_decode($result, true);
+    return !empty($data['success']);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -76,7 +100,21 @@ if (!file_exists($configFile)) {
     log_line('smtp-config.php fehlt -> kann keine Mail versenden (wurde sie hochgeladen?).');
     redirect_error('send');
 }
-require $configFile; // definiert SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD
+require $configFile; // definiert SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, TURNSTILE_SECRET_KEY
+
+// Spam-Schutz (Cloudflare Turnstile). TURNSTILE_SECRET_KEY ist optional
+// definiert -> falls die GitHub-Secrets dafür noch nicht gesetzt sind, wird
+// die Prüfung übersprungen statt das ganze Formular zu blockieren.
+if (defined('TURNSTILE_SECRET_KEY') && TURNSTILE_SECRET_KEY !== '') {
+    $turnstileToken = $_POST['cf-turnstile-response'] ?? '';
+    $remoteIp = $_SERVER['REMOTE_ADDR'] ?? '';
+    if (!verify_turnstile($turnstileToken, TURNSTILE_SECRET_KEY, $remoteIp)) {
+        log_line('Turnstile-Prüfung fehlgeschlagen (Spam-Verdacht) von ' . $remoteIp);
+        redirect_error('captcha');
+    }
+} else {
+    log_line('TURNSTILE_SECRET_KEY nicht gesetzt -> Spam-Prüfung übersprungen.');
+}
 
 $debugLog = '';
 $mail = new PHPMailer(true);

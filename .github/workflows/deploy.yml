@@ -23,9 +23,12 @@ name: Deploy to IONOS Webspace
 #   SMTP_PORT       -> SMTP-Port (465 = SSL/TLS, 587 = STARTTLS)
 #   SMTP_USER       -> Postfach-Adresse zum Einloggen
 #   SMTP_PASSWORD   -> Postfach-Passwort
-# (SMTP_* optional: ohne diese Secrets bleibt smtp-config.php auf dem
-# Webspace unverändert -- praktisch für Deploys, bei denen sich daran nichts
-# ändert, siehe write_smtp_config.py.)
+#   TURNSTILE_SECRET_KEY -> Cloudflare-Turnstile-Secret-Key (Spam-Schutz
+#                    Kontaktformular; der öffentliche Site-Key steht direkt
+#                    in src/pages/kontakt/index.astro)
+# (SMTP_*/TURNSTILE_* optional: ohne diese Secrets bleibt smtp-config.php auf
+# dem Webspace unverändert -- praktisch für Deploys, bei denen sich daran
+# nichts ändert, siehe write_smtp_config.py.)
 on:
   push:
     branches: [ main ]
@@ -58,6 +61,7 @@ jobs:
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
         run: |
           RESULT=$(python3 .github/scripts/write_smtp_config.py)
           echo "$RESULT"

@@ -4,14 +4,21 @@
  *
  * NICHT diese Datei mit echten Zugangsdaten befüllen und committen! Die
  * echte smtp-config.php wird vom Deploy-Workflow (.github/workflows/deploy.yml)
- * aus den GitHub-Secrets SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD erzeugt
- * und direkt auf den Webspace hochgeladen – sie existiert nie im Git-Repo.
+ * aus den GitHub-Secrets SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASSWORD/
+ * TURNSTILE_SECRET_KEY erzeugt und direkt auf den Webspace hochgeladen –
+ * sie existiert nie im Git-Repo.
  *
  * Nur relevant, falls die Zugangsdaten sich mal ändern (neues Postfach,
- * neues Passwort): die GitHub-Secrets aktualisieren, nicht diese Datei.
+ * neues Passwort, neuer Turnstile-Secret-Key): die GitHub-Secrets
+ * aktualisieren, nicht diese Datei.
  */
 
 define('SMTP_HOST', 'smtp.ionos.de');
 define('SMTP_PORT', 465);
 define('SMTP_USER', 'webmaster@rosengarten.casa');
 define('SMTP_PASSWORD', '...');
+
+// Cloudflare Turnstile (Spam-Schutz Kontaktformular) – der Site-Key ist
+// öffentlich und steht direkt in src/pages/kontakt/index.astro, nur der
+// Secret-Key ist geheim.
+define('TURNSTILE_SECRET_KEY', '...');

@@ -95,13 +95,25 @@ seitigen Sandbox, die den lokalen `sendmail`-Aufruf unterbindet).
 | `SMTP_PORT` | `465` (SSL/TLS) oder `587` (STARTTLS) |
 | `SMTP_USER` | Postfach-Adresse zum Einloggen |
 | `SMTP_PASSWORD` | Postfach-Passwort |
+| `TURNSTILE_SECRET_KEY` | Cloudflare-Turnstile-Secret-Key (Spam-Schutz, siehe unten) |
 
-Diese vier Secrets sind **optional**: Der Deploy-Workflow erzeugt daraus bei
+Diese Secrets sind **optional**: Der Deploy-Workflow erzeugt daraus bei
 jedem Lauf `smtp-config.php` und lädt sie direkt auf den Webspace hoch
 (landet **nie** im Git-Repo – das Repo ist öffentlich). Ohne gesetzte
 Secrets bleibt eine bereits vorhandene `smtp-config.php` auf dem Webspace
 unverändert; ist noch keine vorhanden, loggt `contact.php` das klar in
 `mail-error.log` statt lautlos zu scheitern.
+
+**Spam-Schutz (Cloudflare Turnstile):** Das Kontaktformular prüft ein
+Turnstile-Widget serverseitig (`verify_turnstile()` in `contact.php`), bevor
+eine Mail verschickt wird. Der öffentliche **Site-Key** steht direkt im Code
+(`src/pages/kontakt/index.astro`, ungefährlich – ist für alle Besucher
+sowieso sichtbar). Der **Secret-Key** ist das oben genannte
+`TURNSTILE_SECRET_KEY`-Secret. Ohne gesetztes Secret wird die Prüfung
+übersprungen (Formular bleibt nutzbar, aber ohne Spam-Schutz) statt das
+Formular zu blockieren – siehe Log-Meldung in `mail-error.log`.
+Widget verwalten: [dash.cloudflare.com](https://dash.cloudflare.com/) →
+Turnstile.
 
 ### 6. Fertig
 Ab jetzt genügt `./villa.sh deploy "…"`.

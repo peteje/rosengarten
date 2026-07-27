@@ -40,8 +40,10 @@ import Layout from '../../layouts/Layout.astro';
         <label for="message">Nachricht</label>
         <textarea id="message" name="message" required></textarea>
       </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAD_Avu01mq9UQ2KE"></div>
       <button class="btn" type="submit">Nachricht senden</button>
     </form>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
     <p style="text-align:center; margin-top:2rem;">
       Oder direkt:
@@ -62,6 +64,7 @@ import Layout from '../../layouts/Layout.astro';
             email: 'Bitte eine gültige E-Mail-Adresse eingeben.',
             send: 'Die Nachricht konnte nicht versendet werden. Bitte später erneut versuchen oder direkt per E-Mail schreiben.',
             method: 'Unerwarteter Fehler. Bitte das Formular erneut absenden.',
+            captcha: 'Sicherheitsprüfung fehlgeschlagen. Bitte die Checkbox erneut bestätigen und nochmal absenden.',
           };
           box.textContent = messages[error] || 'Es ist ein Fehler aufgetreten. Bitte erneut versuchen.';
           box.style.display = 'block';
