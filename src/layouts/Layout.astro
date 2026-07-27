@@ -13,6 +13,11 @@ const {
   title,
   description = 'Villa Rosengarten – Ferienwohnungen in Burg auf Fehmarn.',
 } = Astro.props;
+
+// Kanonische URL ohne Query-String (z.B. alte WordPress-Parameter wie
+// ?page_id=690, die per .htaccess-Fallback sonst die Startseite ausliefern
+// würden) -> sagt Suchmaschinen eindeutig, welche URL die "echte" ist.
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -22,6 +27,7 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title} · Villa Rosengarten</title>
+    <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <noscript>
       <style>
