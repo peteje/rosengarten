@@ -259,6 +259,17 @@ section {
   margin-bottom: 1rem;
 }
 
+.footer-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #f0e2d8;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Cookie banner */
 #cookie-banner {
   position: fixed;
@@ -281,6 +292,12 @@ section {
   display: flex;
 }
 
+#cookie-banner .cookie-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
 #cookie-banner button {
   background: var(--color-green);
   color: #fff;
@@ -289,6 +306,11 @@ section {
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
+}
+
+#cookie-banner button.cookie-decline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 /* Simple contact form */

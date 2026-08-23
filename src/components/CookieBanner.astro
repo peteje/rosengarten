@@ -1,31 +1,66 @@
 ---
-// Minimaler Cookie-Consent-Banner (Ersatz für das WordPress-Plugin
-// "Real Cookie Banner"). Nur nötig, wenn ihr Tracking/Marketing-Skripte
-// (z. B. Google Analytics, AdSense) einsetzt. Ohne solche Skripte reicht
-// meist schon der Hinweis auf technisch notwendige Cookies in der
-// Datenschutzerklärung, ganz ohne Banner. Anpassen oder entfernen.
+// Cookie-Consent-Banner mit echter Wahl (Akzeptieren/Ablehnen), nicht nur
+// einer Kenntnisnahme -- nötig, seit Google Analytics eingebunden ist
+// (TTDSG §25 / DSGVO: vorherige Einwilligung vor nicht-technisch-
+// notwendigen Cookies/Tracking, nicht nur ein Hinweis danach).
+// Das Skript lädt NUR nach "Akzeptieren" (weder vorher noch bei
+// "Ablehnen") -- kein Consent-Mode-Signal nötig, da ohne Zustimmung schlicht
+// gar kein Google-Skript geladen wird.
+const GA_MEASUREMENT_ID = 'G-5LYES5ZE6S';
 ---
 
 <div id="cookie-banner">
   <span>
-    Diese Website verwendet Cookies, um bestimmte Funktionen bereitzustellen.
-    Details in unserer <a href="/datenschutz/">Datenschutzerklärung</a>.
+    Diese Website verwendet Cookies. Neben technisch notwendigen Cookies
+    setzen wir – nur mit Ihrer Einwilligung – Google Analytics zur
+    statistischen Auswertung der Nutzung ein. Details in unserer
+    <a href="/datenschutz/">Datenschutzerklärung</a>.
   </span>
-  <button id="cookie-accept">Verstanden</button>
+  <div class="cookie-actions">
+    <button id="cookie-decline" class="cookie-decline" type="button">Ablehnen</button>
+    <button id="cookie-accept" type="button">Akzeptieren</button>
+  </div>
 </div>
 
-<script>
+<script define:vars={{ GA_MEASUREMENT_ID }}>
   const KEY = 'rosengarten-cookie-consent';
   const banner = document.getElementById('cookie-banner');
   const acceptBtn = document.getElementById('cookie-accept');
+  const declineBtn = document.getElementById('cookie-decline');
 
-  if (!localStorage.getItem(KEY)) {
+  function loadGoogleAnalytics() {
+    if (window.gtagLoaded) return;
+    window.gtagLoaded = true;
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`;
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      window.dataLayer.push(arguments);
+    }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_MEASUREMENT_ID);
+  }
+
+  const consent = localStorage.getItem(KEY);
+  if (consent === 'accepted') {
+    loadGoogleAnalytics();
+  } else if (consent !== 'declined') {
     banner?.classList.add('show');
   }
 
   acceptBtn?.addEventListener('click', () => {
     localStorage.setItem(KEY, 'accepted');
     banner?.classList.remove('show');
-    // Hier ggf. Analytics/Marketing-Skripte erst NACH Zustimmung laden.
+    loadGoogleAnalytics();
+  });
+
+  declineBtn?.addEventListener('click', () => {
+    localStorage.setItem(KEY, 'declined');
+    banner?.classList.remove('show');
   });
 </script>

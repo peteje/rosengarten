@@ -37,7 +37,7 @@
   # WICHTIG: Wenn ihr weitere Dienste einbindet (z.B. Google Analytics,
   # AdSense, YouTube-Embed), müsst ihr deren Domains hier ergänzen –
   # sonst blockiert der Browser sie stillschweigend.
-  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://login.smoobu.com; script-src 'self' 'unsafe-inline' https://login.smoobu.com https://www.youtube.com https://s.ytimg.com https://challenges.cloudflare.com; connect-src 'self' https://login.smoobu.com https://challenges.cloudflare.com; font-src 'self' https://login.smoobu.com data:; frame-src https://login.smoobu.com https://booking.smoobu.com https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://challenges.cloudflare.com; base-uri 'self'; form-action 'self'; object-src 'none'"
+  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://login.smoobu.com; script-src 'self' 'unsafe-inline' https://login.smoobu.com https://www.youtube.com https://s.ytimg.com https://challenges.cloudflare.com https://www.googletagmanager.com; connect-src 'self' https://login.smoobu.com https://challenges.cloudflare.com https://www.google-analytics.com https://analytics.google.com; font-src 'self' https://login.smoobu.com data:; frame-src https://login.smoobu.com https://booking.smoobu.com https://www.google.com https://www.youtube.com https://www.youtube-nocookie.com https://challenges.cloudflare.com; base-uri 'self'; form-action 'self'; object-src 'none'"
 </IfModule>
 
 # Apache-Version/Server-Details nicht preisgeben

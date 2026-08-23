@@ -26,7 +26,19 @@ const year = new Date().getFullYear();
       <a href="/agb/">AGB</a>
       <a href="/kurtaxe/">Kurtaxe</a>
       <a href="https://www.facebook.com/RosengartenFehmarn" target="_blank" rel="noopener">Facebook</a>
+      <button type="button" id="footer-cookie-settings" class="footer-link-button">Cookie-Einstellungen</button>
     </div>
     <p class="footer-copy">&copy; {year} Villa Rosengarten &middot; Burg auf Fehmarn</p>
   </div>
 </footer>
+
+<script>
+  // Cookie-Banner erneut einblenden (widerruft nicht sofort, sondern lässt
+  // erneut wählen -- Google Analytics bleibt bis zur neuen Entscheidung im
+  // aktuellen Zustand, ein Reload nach "Ablehnen" entfernt es beim nächsten
+  // Seitenaufruf, da es dann nicht mehr geladen wird).
+  document.getElementById('footer-cookie-settings')?.addEventListener('click', () => {
+    localStorage.removeItem('rosengarten-cookie-consent');
+    document.getElementById('cookie-banner')?.classList.add('show');
+  });
+</script>
