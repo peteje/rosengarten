@@ -1,0 +1,75 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PhotoGallery from '../../../components/PhotoGallery.astro';
+import { Image } from 'astro:assets';
+import { getSaunaFitnessImages } from '../../../lib/galleries.js';
+import heroSauna from '../../../images/sauna-fitness-hero.jpg';
+
+const galleryImages = getSaunaFitnessImages();
+
+const features = [
+  'Finnish sauna',
+  'Fitness area with dumbbells & punching bag',
+  'Relaxation & lounge area',
+  'Low season & winter, for a surcharge',
+];
+---
+
+<Layout title="Sauna & Fitness" description="Villa Rosengarten’s own wellness and fitness area in the old barn: a Finnish sauna and fitness corner, available in the low season and winter by appointment.">
+  <section class="apt-hero">
+    <Image
+      class="apt-hero-img"
+      src={heroSauna}
+      alt="Finnish sauna at Villa Rosengarten"
+      widths={[800, 1600, 2200]}
+      sizes="100vw"
+      loading="eager"
+    />
+    <div class="apt-hero-content">
+      <p class="eyebrow">Villa Rosengarten</p>
+      <h1>Sauna &amp; Fitness</h1>
+      <p class="apt-hero-sub">The villa’s own wellness area in the old barn – relaxation after a day at the sea.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="apt-section">
+      <ul class="feature-list apt-features">
+        {features.map((f) => <li>{f}</li>)}
+      </ul>
+
+      <p>
+        In the villa’s old barn, our guests have their own small wellness and
+        fitness area. Downstairs, loungers beneath exposed wooden beams invite
+        you to relax – the ideal spot to wind down after a long beach day or a
+        session of kiting.
+      </p>
+      <p>
+        The Finnish sauna provides cosy warmth and relaxation for body and
+        mind. Upstairs, a small fitness area with a punching bag, weight bench
+        and training mats is ready for anyone who doesn’t want to skip their
+        workout, even on holiday.
+      </p>
+      <p>
+        The sauna and fitness area are available to all Villa Rosengarten
+        guests in the low season and winter, by individual appointment and
+        for a surcharge. Feel free to ask us during your stay, or write to us
+        in advance via the contact form.
+      </p>
+    </div>
+  </section>
+
+  {galleryImages.length > 0 && (
+    <section class="wrap">
+      <h2 class="section-title">Impressions</h2>
+      <PhotoGallery images={galleryImages} name="Sauna & Fitness" layout="masonry" />
+    </section>
+  )}
+
+  <section class="wrap">
+    <div class="booking-cta">
+      <a class="btn btn-lg" href="/en/ferienwohnungen/">View apartments</a>
+      <a class="btn btn-ghost-dark" href="/en/kontakt/">Request an appointment</a>
+    </div>
+  </section>
+</Layout>

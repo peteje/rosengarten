@@ -6,19 +6,22 @@
 // Das Skript lädt NUR nach "Akzeptieren" (weder vorher noch bei
 // "Ablehnen") -- kein Consent-Mode-Signal nötig, da ohne Zustimmung schlicht
 // gar kein Google-Skript geladen wird.
+import { t, localePrefix } from '../i18n/ui.js';
+
 const GA_MEASUREMENT_ID = 'G-5LYES5ZE6S';
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const c = t(lang).cookie;
+const p = localePrefix(lang);
 ---
 
 <div id="cookie-banner">
   <span>
-    Diese Website verwendet Cookies. Neben technisch notwendigen Cookies
-    setzen wir – nur mit Ihrer Einwilligung – Google Analytics zur
-    statistischen Auswertung der Nutzung ein. Details in unserer
-    <a href="/datenschutz/">Datenschutzerklärung</a>.
+    {c.text}
+    {' '}<a href={`${p}/datenschutz/`}>{c.privacyLink}</a>.
   </span>
   <div class="cookie-actions">
-    <button id="cookie-decline" class="cookie-decline" type="button">Ablehnen</button>
-    <button id="cookie-accept" type="button">Akzeptieren</button>
+    <button id="cookie-decline" class="cookie-decline" type="button">{c.decline}</button>
+    <button id="cookie-accept" type="button">{c.accept}</button>
   </div>
 </div>
 

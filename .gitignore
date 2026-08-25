@@ -19,3 +19,10 @@ smtp-config.php
 # Roh-Mediathek (nur Quelle für den Foto-Import; die einsortierten
 # Galeriebilder unter src/images/ werden versioniert)
 _originale/
+
+# Laufzeit-Logs/Marker, die nur auf dem Webspace entstehen (contact.php,
+# webhook-smoobu.php) – nie committen.
+public/mail-error.log
+mail-error.log
+public/booking-emails-sent/
+booking-emails-sent/

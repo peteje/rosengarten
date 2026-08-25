@@ -1,0 +1,88 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout title="Contact" description="Contact & booking inquiry – write to Villa Rosengarten on Fehmarn for an individual offer.">
+  <section class="wrap" style="padding-top:3rem;">
+    <h1 class="section-title">Contact &amp; booking inquiry</h1>
+
+    <p style="text-align:center; max-width:640px; margin:0 auto 2rem;">
+      Do you have questions about an apartment, want to request a shorter stay,
+      or would like an individual offer? Feel free to write to us – we’ll get
+      back to you personally.
+    </p>
+
+    <div id="form-message" style="display:none; max-width:560px; margin:0 auto 1.5rem; padding:1rem; border-radius:8px;"></div>
+
+    <form class="contact-form" action="/contact.php" method="POST">
+      <!-- Honeypot-Feld gegen Spam-Bots: für Menschen unsichtbar, bleibt leer -->
+      <div style="position:absolute; left:-9999px;" aria-hidden="true">
+        <label for="website">Leave this field empty</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <input type="hidden" name="lang" value="en" />
+
+      <div>
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" required />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required />
+        <p class="field-error" id="email-error" hidden>Please enter a valid email address.</p>
+      </div>
+      <div>
+        <label for="message">Message</label>
+        <textarea id="message" name="message" required></textarea>
+      </div>
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAAD_Avu01mq9UQ2KE"></div>
+      <button class="btn" type="submit">Send message</button>
+    </form>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <p style="text-align:center; margin-top:2rem;">
+      Or directly:
+      <a href="mailto:info@rosengarten.casa">info@rosengarten.casa</a>
+      &middot;
+      <a href="tel:+4943716074284">+49 4371 6074284</a>
+    </p>
+
+    <script>
+      // Zeigt eine Fehlermeldung, falls contact.php mit ?error=... zurückleitet.
+      const params = new URLSearchParams(window.location.search);
+      const error = params.get('error');
+      if (error) {
+        const box = document.getElementById('form-message');
+        if (box) {
+          const messages = {
+            missing: 'Please fill in all fields.',
+            email: 'Please enter a valid email address.',
+            send: 'The message could not be sent. Please try again later or write to us directly by email.',
+            method: 'Unexpected error. Please submit the form again.',
+            captcha: 'Security check failed. Please confirm the checkbox again and resubmit.',
+          };
+          box.textContent = messages[error] || 'An error occurred. Please try again.';
+          box.style.display = 'block';
+          box.style.background = '#fbe4e4';
+          box.style.color = '#7a1f1f';
+        }
+      }
+
+      // E-Mail-Syntax direkt beim Verlassen des Feldes prüfen (nicht erst
+      // nach dem Absenden) -> Feld rot markieren + Hinweistext einblenden.
+      const emailInput = document.getElementById('email') as HTMLInputElement | null;
+      const emailError = document.getElementById('email-error');
+      if (emailInput && emailError) {
+        const validate = () => {
+          const invalid = emailInput.value !== '' && !emailInput.validity.valid;
+          emailInput.classList.toggle('field-invalid', invalid);
+          emailError.hidden = !invalid;
+        };
+        emailInput.addEventListener('blur', validate);
+        emailInput.addEventListener('input', () => {
+          if (emailInput.classList.contains('field-invalid')) validate();
+        });
+      }
+    </script>
+  </section>
+</Layout>

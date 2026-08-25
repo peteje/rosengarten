@@ -1,0 +1,196 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ApartmentCard from '../../components/ApartmentCard.astro';
+import PhotoGallery from '../../components/PhotoGallery.astro';
+import { apartments } from '../../data/apartments.js';
+import { apartmentTranslations } from '../../data/apartments.en.js';
+import { getPriceMap, getPriceRange } from '../../lib/prices.js';
+import { getImpressionenImages } from '../../lib/galleries.js';
+import VideoEmbed from '../../components/VideoEmbed.astro';
+import Testimonials from '../../components/Testimonials.astro';
+import { Image, getImage } from 'astro:assets';
+
+const priceMap = await getPriceMap();
+const { min: priceMin, max: priceMax } = await getPriceRange();
+
+import heroVilla from '../../images/home/hero-villa.jpg';
+import kiteAction from '../../images/home/kite-action.jpg';
+import hundStrand from '../../images/home/hund-strand.jpg';
+import sauna from '../../images/home/sauna.jpg';
+import sundowner from '../../images/home/sundowner.jpg';
+import familie from '../../images/home/familie.jpg';
+import segeln from '../../images/home/segeln.jpg';
+import seebruecke from '../../images/home/seebruecke.jpg';
+
+const heroBg = await getImage({ src: heroVilla, width: 2200, format: 'webp' });
+const bandBg = await getImage({ src: seebruecke, width: 2000, format: 'webp' });
+
+const experiences = [
+  { img: kiteAction, title: 'Kiting & watersports', text: 'Right on our doorstep: one of the best kite and surf spots on the Baltic.' },
+  { img: hundStrand, title: 'Beach & dogs welcome', text: 'Miles of beaches – and your four-legged friend is welcome too.' },
+  { img: familie, title: 'Family time', text: 'Plenty of space, short distances, toys in the apartments – great for young and old alike.' },
+  { img: sauna, title: 'Sauna & fitness', text: 'Our own sauna and fitness area, bookable individually.', href: '/en/sauna-fitness/' },
+  { img: segeln, title: 'Sailing & the sea', text: 'A harbour, sailing waters and trips across the whole island.' },
+  { img: sundowner, title: 'Dining & sundowners', text: 'Restaurants and bars in Burg’s old town just a few steps away.' },
+];
+
+const highlights = [
+  '4 holiday apartments for 2–6 guests',
+  'No extra cost for linen & towels',
+  'Final cleaning included',
+  'High-speed WiFi · Sauna · Fitness',
+];
+
+const distances = [
+  { value: '150 m', label: 'Burg old town & shopping' },
+  { value: '50 m', label: 'Café & breakfast' },
+  { value: '1 km', label: 'Bus and train' },
+  { value: 'Indoor', label: 'Sauna & fitness' },
+  { value: 'a few min.', label: 'Beach & kite spot' },
+  { value: '90 km', label: 'Airport' },
+];
+
+const impressionen = getImpressionenImages();
+---
+
+<Layout title="Home" description="Villa Rosengarten – four premium holiday apartments in Burg on the island of Fehmarn. Kiting, beach, sauna, dog-friendly. Check availability and book directly now.">
+  <!-- HERO -->
+  <section class="hero-full">
+    <div class="hero-bg" data-parallax style={`background-image:url(${heroBg.src})`}></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-kicker">A holiday on Fehmarn, the sunshine island</p>
+      <h1>Villa Rosengarten</h1>
+      <p class="hero-sub">
+        Four individual holiday apartments in Burg – central, quiet and finished
+        to a high standard. Kiting, beach, sauna and short walks into the old town.
+      </p>
+      <div class="btn-row">
+        <a class="btn" href="/en/ferienwohnungen/">View apartments</a>
+        <a class="btn btn-ghost" href="/en/buchen/">Book now</a>
+      </div>
+    </div>
+    <a class="hero-scroll" href="#erlebnis" aria-label="Scroll down">
+      <span></span>
+    </a>
+  </section>
+
+  <!-- HIGHLIGHTS-STREIFEN -->
+  <div class="highlight-strip">
+    <div class="wrap">
+      <ul>
+        {highlights.map((h) => <li>{h}</li>)}
+      </ul>
+    </div>
+  </div>
+
+  <!-- ERLEBNIS / AKTIV & FAMILIE -->
+  <section id="erlebnis" class="wrap">
+    <h2 class="section-title reveal">Active holidays & family time</h2>
+    <p class="section-lead reveal">
+      The perfect spot for kiting, surfing and golfing with a sea view – or simply
+      for unwinding and enjoying yourself.
+    </p>
+    <div class="experience-grid">
+      {experiences.map((e) => {
+        const Tag = e.href ? 'a' : 'article';
+        return (
+          <Tag class="exp-tile reveal" href={e.href}>
+            <Image src={e.img} alt={e.title} widths={[400, 800]} sizes="(max-width:700px) 90vw, 380px" loading="lazy" />
+            <div class="exp-caption">
+              <h3>{e.title}</h3>
+              <p>{e.text}</p>
+            </div>
+          </Tag>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- VIDEO -->
+  <section class="wrap">
+    <h2 class="section-title reveal">Villa Rosengarten on video</h2>
+    <p class="section-lead reveal">A short tour of the property and the island of Fehmarn.</p>
+    <div class="video-wrap reveal">
+      <VideoEmbed id="laXBJe5MkNY" title="Play Villa Rosengarten image film" />
+    </div>
+  </section>
+
+  <!-- WOHNUNGEN -->
+  <section class="wrap section-tint">
+    <h2 class="section-title reveal">Our holiday apartments</h2>
+    <p class="section-lead reveal">Four apartments, each with its own character – from €{priceMin} to €{priceMax} per night.</p>
+    <div class="apartment-grid">
+      {apartments.map((apt) => {
+        const tr = apartmentTranslations[apt.slug];
+        return (
+          <div class="reveal">
+            <ApartmentCard
+              slug={apt.slug}
+              name={tr.name}
+              teaser={tr.teaser}
+              priceFrom={priceMap[apt.slug]}
+              cover={apt.cover}
+            />
+          </div>
+        );
+      })}
+    </div>
+  </section>
+
+  <!-- ENTFERNUNGEN-BAND -->
+  <section class="band" style={`background-image:url(${bandBg.src})`}>
+    <div class="band-overlay"></div>
+    <div class="wrap band-inner">
+      <h2 class="reveal">Right in the heart of Fehmarn</h2>
+      <div class="distance-grid">
+        {distances.map((d) => (
+          <div class="distance-item reveal">
+            <span class="distance-value">{d.value}</span>
+            <span class="distance-label">{d.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPRESSIONEN -->
+  <section class="wrap">
+    <h2 class="section-title reveal">Impressions</h2>
+    <p class="section-lead reveal">Island, beach and sea – a few impressions of Fehmarn.</p>
+    <PhotoGallery images={impressionen} name="Villa Rosengarten & Fehmarn" layout="masonry" />
+  </section>
+
+  <!-- BEWERTUNGEN -->
+  <Testimonials />
+
+  <!-- ABSCHLUSS-CTA -->
+  <section class="cta-band" style={`background-image:url(${heroBg.src})`}>
+    <div class="band-overlay"></div>
+    <div class="wrap cta-inner reveal">
+      <h2>We look forward to welcoming you</h2>
+      <p>Secure your dream holiday on Fehmarn.</p>
+      <div class="btn-row btn-row--center">
+        <a class="btn" href="/en/buchen/">Check availability & book</a>
+        <a class="btn btn-ghost" href="/en/kontakt/">Personal inquiry</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Sanftes Hero-Parallax (Reveal-on-Scroll läuft global im Layout).
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduce) {
+    const bg = document.querySelector('[data-parallax]') as HTMLElement | null;
+    if (bg) {
+      const onScroll = () => {
+        const y = window.scrollY;
+        if (y < window.innerHeight) bg.style.transform = `translate3d(0, ${y * 0.35}px, 0) scale(1.1)`;
+      };
+      onScroll();
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
+  }
+</script>

@@ -1,7 +1,12 @@
 ---
 import { Image } from 'astro:assets';
 import ventovinte from '../images/ventovinte-logo.png';
+import { t, localePrefix } from '../i18n/ui.js';
+
 const year = new Date().getFullYear();
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const f = t(lang).footer;
+const p = localePrefix(lang);
 ---
 
 <footer class="site-footer">
@@ -9,9 +14,9 @@ const year = new Date().getFullYear();
     <div class="footer-top">
       <div class="footer-brand">
         <strong>Villa Rosengarten</strong>
-        <p>Vier Ferienwohnungen in Burg auf Fehmarn.<br />Highspeed-WLAN · Sauna · Fitness · Hunde willkommen.</p>
+        <p>{f.tagline}<br />{f.amenities}</p>
         <a class="footer-vv-link" href="https://www.ventovinte.com" target="_blank" rel="noopener" aria-label="VentoVinte – Website öffnen">
-          <span class="footer-vv-label">Ein Angebot von</span>
+          <span class="footer-vv-label">{f.offeredBy}</span>
           <Image src={ventovinte} alt="VentoVinte" class="footer-vv" loading="lazy" />
         </a>
       </div>
@@ -21,14 +26,14 @@ const year = new Date().getFullYear();
       </div>
     </div>
     <div class="footer-links">
-      <a href="/impressum/">Impressum</a>
-      <a href="/datenschutz/">Datenschutz</a>
-      <a href="/agb/">AGB</a>
-      <a href="/kurtaxe/">Kurtaxe</a>
+      <a href={`${p}/impressum/`}>{f.impressum}</a>
+      <a href={`${p}/datenschutz/`}>{f.datenschutz}</a>
+      <a href={`${p}/agb/`}>{f.agb}</a>
+      <a href={`${p}/kurtaxe/`}>{f.kurtaxe}</a>
       <a href="https://www.facebook.com/RosengartenFehmarn" target="_blank" rel="noopener">Facebook</a>
-      <button type="button" id="footer-cookie-settings" class="footer-link-button">Cookie-Einstellungen</button>
+      <button type="button" id="footer-cookie-settings" class="footer-link-button">{f.cookieSettings}</button>
     </div>
-    <p class="footer-copy">&copy; {year} Villa Rosengarten &middot; Burg auf Fehmarn</p>
+    <p class="footer-copy">{f.copyright(year)}</p>
   </div>
 </footer>
 

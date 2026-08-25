@@ -1,0 +1,23 @@
+---
+// Sprachumschalter DE/EN. Die Seitenstruktur ist unter /en/ 1:1 gespiegelt
+// (gleiche Pfad-Segmente wie auf Deutsch), daher reicht simples Prefixen/
+// Entfernen von "/en" -> kein Übersetzungs-Mapping der Slugs nötig.
+import { t } from '../i18n/ui.js';
+
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const strings = t(lang).langSwitch;
+const path = Astro.url.pathname;
+
+const dePath = lang === 'en' ? path.replace(/^\/en(\/|$)/, '/') : path;
+const enPath = lang === 'en' ? path : `/en${path}`;
+---
+
+<div class="lang-switch" aria-label="Sprache / Language">
+  <a href={dePath} aria-current={lang === 'de' ? 'page' : undefined} class={lang === 'de' ? 'is-active' : ''}>
+    {strings.de}
+  </a>
+  <span aria-hidden="true">/</span>
+  <a href={enPath} aria-current={lang === 'en' ? 'page' : undefined} class={lang === 'en' ? 'is-active' : ''}>
+    {strings.en}
+  </a>
+</div>

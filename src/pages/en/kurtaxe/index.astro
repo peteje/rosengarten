@@ -1,0 +1,29 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+// Zahlungslink der Stadt Fehmarn (welcmpass) – Villa Rosengarten ist im
+// Formular bereits vorbelegt.
+const kurtaxeUrl =
+  'https://web.welcmpass.info/?active=true&addressCity=Fehmarn&addressStreetAndNumber=Gahlendorfer%20Weg%208&addressZip=23769&communeId=2192&id=3598&identificationNr=01054091-80025795-3598&name=Villa%20Rosengarten';
+---
+
+<Layout title="Visitor's Tax" description="Pay the visitor's tax for your stay at Villa Rosengarten conveniently online.">
+  <section class="wrap" style="padding-top:3rem;">
+    <div class="legal-content">
+      <h1>Pay the visitor’s tax online</h1>
+      <p>
+        The town of Fehmarn offers digital payment of the visitor’s tax
+        (Kurtaxe). Use the link below to pay your visitor’s tax conveniently
+        online. Villa Rosengarten is already pre-filled in the form. You can
+        then print the receipt or save it digitally.
+      </p>
+      <p style="text-align:center; margin:2rem 0;">
+        <a class="btn" href={kurtaxeUrl} target="_blank" rel="noopener">Pay visitor’s tax online now →</a>
+      </p>
+      <p style="text-align:center; color:#776;">
+        Click the visitor’s tax button, or scan the QR code on-site in your
+        apartment.
+      </p>
+    </div>
+  </section>
+</Layout>

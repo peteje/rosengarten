@@ -26,9 +26,18 @@ name: Deploy to IONOS Webspace
 #   TURNSTILE_SECRET_KEY -> Cloudflare-Turnstile-Secret-Key (Spam-Schutz
 #                    Kontaktformular; der öffentliche Site-Key steht direkt
 #                    in src/pages/kontakt/index.astro)
-# (SMTP_*/TURNSTILE_* optional: ohne diese Secrets bleibt smtp-config.php auf
-# dem Webspace unverändert -- praktisch für Deploys, bei denen sich daran
-# nichts ändert, siehe write_smtp_config.py.)
+#   SMOOBU_API_KEY   -> für die Live-Buchungsstatus-Seite/Webhook (nicht der
+#   SMOOBU_API_SECRET   Build-Zeit-Preisabruf -- gleiche Zugangsdaten wie in
+#                        ~/.villa-secrets.env, hier aber für Laufzeit-Abrufe
+#                        von public/webhook-smoobu.php und meine-buchung.php)
+#   BOOKING_LINK_SECRET  -> selbst gewähltes langes Zufalls-Secret, signiert
+#                           die Links in den "Meine Buchung"-E-Mails
+#   SMOOBU_WEBHOOK_TOKEN -> selbst gewähltes Token, das Smoobu beim Aufruf
+#                           der Webhook-URL als ?token=... mitschicken muss
+#                           (Smoobu signiert Webhooks nicht selbst)
+# (SMTP_*/TURNSTILE_*/SMOOBU_*/BOOKING_LINK_SECRET optional: ohne diese
+# Secrets bleibt smtp-config.php auf dem Webspace unverändert -- praktisch
+# für Deploys, bei denen sich daran nichts ändert, siehe write_smtp_config.py.)
 on:
   push:
     branches: [ main ]
@@ -62,6 +71,10 @@ jobs:
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
+          SMOOBU_API_SECRET: ${{ secrets.SMOOBU_API_SECRET }}
+          BOOKING_LINK_SECRET: ${{ secrets.BOOKING_LINK_SECRET }}
+          SMOOBU_WEBHOOK_TOKEN: ${{ secrets.SMOOBU_WEBHOOK_TOKEN }}
         run: |
           RESULT=$(python3 .github/scripts/write_smtp_config.py)
           echo "$RESULT"

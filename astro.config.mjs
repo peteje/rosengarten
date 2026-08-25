@@ -6,9 +6,16 @@ export default defineConfig({
   site: 'https://rosengarten.casa',
   trailingSlash: 'always',
   output: 'static',
+  i18n: {
+    defaultLocale: 'de',
+    locales: ['de', 'en'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   integrations: [
     sitemap({
-      // Danke-Seite ist nur ein Formular-Redirect-Ziel, kein Inhalt für Suchmaschinen.
+      // Danke-Seiten sind nur Formular-Redirect-Ziele, kein Inhalt für Suchmaschinen.
       filter: (page) => !page.includes('/kontakt/danke/'),
     }),
   ],

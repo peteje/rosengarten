@@ -1,0 +1,99 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PhotoGallery from '../../../components/PhotoGallery.astro';
+import SmoobuCalendar from '../../../components/SmoobuCalendar.astro';
+import VideoEmbed from '../../../components/VideoEmbed.astro';
+import { Image } from 'astro:assets';
+import { apartments } from '../../../data/apartments.js';
+import { apartmentTranslations } from '../../../data/apartments.en.js';
+import { getGallery, getCover } from '../../../lib/galleries.js';
+import { getPriceMap } from '../../../lib/prices.js';
+
+export function getStaticPaths() {
+  return apartments.map((apt) => ({
+    params: { slug: apt.slug },
+    props: { apt, tr: apartmentTranslations[apt.slug] },
+  }));
+}
+
+const { apt, tr } = Astro.props;
+const images = getGallery(apt.slug);
+const hero = getCover(apt.slug, apt.cover);
+const priceMap = await getPriceMap();
+const priceFrom = priceMap[apt.slug];
+---
+
+<Layout title={tr.name} description={tr.teaser}>
+  <!-- HERO mit Text im Bild -->
+  <section class="apt-hero">
+    {hero && (
+      <Image
+        class="apt-hero-img"
+        src={hero}
+        alt={`${tr.name} – Villa Rosengarten`}
+        widths={[800, 1600, 2200]}
+        sizes="100vw"
+        loading="eager"
+      />
+    )}
+    <div class="apt-hero-content">
+      <p class="eyebrow">{tr.location}</p>
+      <h1>{tr.name}</h1>
+      <p class="apt-hero-sub">{tr.subtitle}</p>
+      <span class="apt-hero-price">from €{priceFrom} / night · up to {apt.maxGuests} guests</span>
+    </div>
+  </section>
+
+  <!-- AUSSTATTUNG + BESCHREIBUNG -->
+  <section class="wrap">
+    <div class="apt-section">
+      <ul class="feature-list apt-features">
+        {tr.features.map((f) => <li>{f}</li>)}
+      </ul>
+
+      {tr.note && <p class="note">{tr.note}</p>}
+
+      {tr.description.map((para) => <p>{para}</p>)}
+
+      <ul class="facts">
+        {apt.sizeSqm && <li>Size: approx. {apt.sizeSqm} m²</li>}
+        <li>Max. guests: {apt.maxGuests}</li>
+        <li>Price: from €{priceFrom} / night</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- VIDEO-RUNDGANG -->
+  {apt.video && (
+    <section class="wrap">
+      <h2 class="section-title">Video tour of {tr.name}</h2>
+      <div class="video-wrap">
+        <VideoEmbed id={apt.video} title={`Play video tour of ${tr.name}`} />
+      </div>
+    </section>
+  )}
+
+  <!-- GALERIE -->
+  <section class="wrap">
+    <h2 class="section-title">Photo gallery {tr.name}</h2>
+    {images.length > 0 ? (
+      <PhotoGallery images={images} name={tr.name} layout="masonry" />
+    ) : (
+      <div class="card-image-placeholder" style="aspect-ratio:16/9; border-radius: var(--radius);">
+        Photo gallery coming soon
+      </div>
+    )}
+  </section>
+
+  <!-- BELEGUNGSKALENDER (Smoobu) -->
+  <div class="wrap">
+    <SmoobuCalendar
+      aptId={apt.smoobuId}
+      verification={apt.smoobuVerification}
+      name={tr.name}
+    />
+    <p style="text-align:center; margin-bottom:2rem;">
+      <a href="/en/ferienwohnungen/">← Back to overview</a>
+    </p>
+  </div>
+</Layout>

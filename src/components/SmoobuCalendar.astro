@@ -7,6 +7,7 @@
 // Domain login.smoobu.com (script-src, style-src, connect-src, frame-src,
 // font-src) – sonst blockiert der Browser das Widget.
 import BookingTool from './BookingTool.astro';
+import { localePrefix } from '../i18n/ui.js';
 
 interface Props {
   aptId: string;
@@ -14,18 +15,36 @@ interface Props {
   name: string;
 }
 const { aptId, verification, name } = Astro.props;
-const loadUrl = `https://login.smoobu.com/de/cockpit/widget/single-calendar/${aptId}`;
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const p = localePrefix(lang);
+const loadUrl = `https://login.smoobu.com/${lang}/cockpit/widget/single-calendar/${aptId}`;
+
+const strings =
+  lang === 'en'
+    ? {
+        calendarHeading: `Availability calendar ${name}`,
+        calendarLead:
+          'Green = available, booked days are marked. To book with instant confirmation, continue directly to our booking portal.',
+        bookHeading: `Book ${name} instantly`,
+        bookLead: 'Book online directly, with instant confirmation.',
+        inquiry: 'Personal inquiry',
+      }
+    : {
+        calendarHeading: `Belegungskalender ${name}`,
+        calendarLead:
+          'Grün = frei, belegte Tage sind markiert. Für die verbindliche Buchung mit sofortiger Bestätigung geht es direkt weiter zu unserem Buchungsportal.',
+        bookHeading: `${name} verbindlich buchen`,
+        bookLead: 'Direkt online buchen, mit sofortiger Bestätigung.',
+        inquiry: 'Individuelle Anfrage',
+      };
 ---
 
 <section class="booking" id="belegungskalender">
-  <h2 class="section-title">Belegungskalender {name}</h2>
-  <p class="section-lead">
-    Grün = frei, belegte Tage sind markiert. Für die verbindliche Buchung mit
-    sofortiger Bestätigung geht es direkt weiter zu unserem Buchungsportal.
-  </p>
+  <h2 class="section-title">{strings.calendarHeading}</h2>
+  <p class="section-lead">{strings.calendarLead}</p>
 
   <div class="smoobu-calendar">
-    <div class="calendarWidget" id={`smoobuApartment${aptId}de`}>
+    <div class="calendarWidget" id={`smoobuApartment${aptId}${lang}`}>
       <div
         class="calendarContent"
         data-load-calendar-url={loadUrl}
@@ -37,11 +56,11 @@ const loadUrl = `https://login.smoobu.com/de/cockpit/widget/single-calendar/${ap
     </div>
   </div>
 
-  <h2 class="section-title">{name} verbindlich buchen</h2>
-  <p class="section-lead">Direkt online buchen, mit sofortiger Bestätigung.</p>
+  <h2 class="section-title">{strings.bookHeading}</h2>
+  <p class="section-lead">{strings.bookLead}</p>
   <BookingTool apartmentId={aptId} />
 
   <div class="booking-cta">
-    <a class="btn btn-ghost-dark" href="/kontakt/">Individuelle Anfrage</a>
+    <a class="btn btn-ghost-dark" href={`${p}/kontakt/`}>{strings.inquiry}</a>
   </div>
 </section>

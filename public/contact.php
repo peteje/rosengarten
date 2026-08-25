@@ -33,8 +33,15 @@ use PHPMailer\PHPMailer\SMTP;
 
 $to = 'info@rosengarten.casa'; // Empfänger der Kontaktanfragen
 
+// Sprache kommt aus einem versteckten Formularfeld (siehe kontakt/index.astro
+// bzw. en/kontakt/index.astro) -> Redirects bleiben auf der Sprache, von der
+// aus abgeschickt wurde, statt immer auf die deutsche Seite zu springen.
+$lang = ($_POST['lang'] ?? 'de') === 'en' ? 'en' : 'de';
+$langPrefix = $lang === 'en' ? '/en' : '';
+
 function redirect_error(string $reason): void {
-    header('Location: /kontakt/?error=' . urlencode($reason));
+    global $langPrefix;
+    header('Location: ' . $langPrefix . '/kontakt/?error=' . urlencode($reason));
     exit;
 }
 
@@ -75,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 // Honeypot-Feld: unsichtbar für Menschen, wird nur von Spam-Bots ausgefüllt.
 // Erfolg vortäuschen, damit Bots nichts merken, aber nichts verschicken.
 if (!empty($_POST['website'])) {
-    header('Location: /kontakt/danke/');
+    header('Location: ' . $langPrefix . '/kontakt/danke/');
     exit;
 }
 
@@ -137,14 +144,14 @@ try {
     $mail->addAddress($to);
     $mail->addReplyTo($email, $name);
 
-    $mail->Subject = 'Neue Kontaktanfrage über die Website';
+    $mail->Subject = ($lang === 'en' ? '[EN] ' : '') . 'Neue Kontaktanfrage über die Website';
     $mail->Body = "Neue Nachricht über das Kontaktformular auf rosengarten.casa:\n\n"
                 . "Name: {$name}\n"
                 . "E-Mail: {$email}\n\n"
                 . "Nachricht:\n{$message}\n";
 
     $mail->send();
-    header('Location: /kontakt/danke/');
+    header('Location: ' . $langPrefix . '/kontakt/danke/');
 } catch (PHPMailerException $e) {
     log_line('PHPMailer-Fehler: ' . $mail->ErrorInfo . " | SMTP-Protokoll:\n" . $debugLog);
     redirect_error('send');

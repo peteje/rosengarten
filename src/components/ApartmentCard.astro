@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import { getCover } from '../lib/galleries.js';
+import { t, localePrefix } from '../i18n/ui.js';
 
 interface Props {
   slug: string;
@@ -12,9 +13,12 @@ interface Props {
 
 const { slug, name, teaser, priceFrom, cover: coverName } = Astro.props;
 const cover = getCover(slug, coverName);
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const c = t(lang).card;
+const p = localePrefix(lang);
 ---
 
-<a class="card" href={`/${slug}/`}>
+<a class="card" href={`${p}/${slug}/`}>
   <div class="card-media">
     {cover ? (
       <Image
@@ -27,11 +31,11 @@ const cover = getCover(slug, coverName);
     ) : (
       <div class="card-image-placeholder">Foto {name} folgt<br />(src/images/apartments/{slug}/)</div>
     )}
-    <span class="card-badge">ab {priceFrom} €</span>
+    <span class="card-badge">{c.from} {priceFrom} €</span>
   </div>
   <div class="card-body">
     <h3>{name}</h3>
     <p>{teaser}</p>
-    <span class="card-cta">Details ansehen →</span>
+    <span class="card-cta">{c.details}</span>
   </div>
 </a>

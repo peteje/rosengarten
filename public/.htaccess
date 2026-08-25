@@ -51,5 +51,10 @@ Options -Indexes
   Require all denied
 </FilesMatch>
 
+# Marker-Dateien der "Meine Buchung"-Mails (nur Datum+E-Mail, aber trotzdem
+# nicht öffentlich abrufbar) und PHP-Helper-Bibliothek nicht direkt erreichbar.
+RedirectMatch 404 ^/booking-emails-sent/
+RedirectMatch 404 ^/lib/
+
 # Eigene 404-Seite
 ErrorDocument 404 /404.html

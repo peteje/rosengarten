@@ -3,8 +3,11 @@
 // Places API), Booking.com/Airbnb als handverlesene Zitate aus
 // _originale/bewertungen.md (siehe src/lib/reviews.js).
 import { getReviews } from '../lib/reviews.js';
+import { t } from '../i18n/ui.js';
 
 const { google, all } = await getReviews();
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const tt = t(lang).testimonials;
 
 const sourceLabel = {
   google: 'Google',
@@ -15,19 +18,19 @@ const sourceLabel = {
 
 {all.length > 0 && (
   <section class="wrap">
-    <h2 class="section-title reveal">Das sagen unsere Gäste</h2>
+    <h2 class="section-title reveal">{tt.heading}</h2>
     {google.rating && (
       <p class="section-lead reveal">
-        <strong>{google.rating.toFixed(1).replace('.', ',')} ★</strong> auf Google
-        {google.count ? ` · ${google.count} Bewertungen` : ''}
+        <strong>{google.rating.toFixed(1).replace('.', lang === 'de' ? ',' : '.')} ★</strong> {tt.onGoogle}
+        {google.count ? ` · ${google.count} ${tt.reviews}` : ''}
         {google.mapsUri && (
-          <> · <a href={google.mapsUri} target="_blank" rel="noopener">alle ansehen →</a></>
+          <> · <a href={google.mapsUri} target="_blank" rel="noopener">{tt.seeAll}</a></>
         )}
       </p>
     )}
 
     <div class="review-carousel reveal">
-      <button class="review-nav review-prev" type="button" data-review-prev aria-label="Vorherige Bewertung">&#8249;</button>
+      <button class="review-nav review-prev" type="button" data-review-prev aria-label={tt.prev}>&#8249;</button>
       <div class="review-grid" data-review-track>
         {all.map((r) => (
           <div class="review-card">
@@ -46,7 +49,7 @@ const sourceLabel = {
                 <p class="review-name">{r.name}</p>
                 <p class="review-meta">
                   {r.rating ? (
-                    <span class="review-stars" aria-label={`${r.rating} von ${r.ratingMax ?? 5} Sternen`}>
+                    <span class="review-stars" aria-label={tt.stars(r.rating, r.ratingMax ?? 5)}>
                       {'★'.repeat(Math.round(r.rating))}{'☆'.repeat((r.ratingMax ?? 5) - Math.round(r.rating))}
                     </span>
                   ) : (
@@ -61,7 +64,7 @@ const sourceLabel = {
           </div>
         ))}
       </div>
-      <button class="review-nav review-next" type="button" data-review-next aria-label="Nächste Bewertung">&#8250;</button>
+      <button class="review-nav review-next" type="button" data-review-next aria-label={tt.next}>&#8250;</button>
     </div>
   </section>
 )}

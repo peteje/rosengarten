@@ -1,0 +1,82 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PhotoGallery from '../../../components/PhotoGallery.astro';
+import { Image } from 'astro:assets';
+import { getWintervillaImages } from '../../../lib/galleries.js';
+import heroWinter from '../../../images/wintervilla-hero.jpg';
+
+const galleryImages = getWintervillaImages();
+
+const features = [
+  'Wood stove & wall heating',
+  'Sauna & fitness',
+  'High-speed WiFi',
+  'Quiet low season',
+  'Dogs welcome',
+  'Short distances, empty beaches',
+];
+---
+
+<Layout title="Winter Villa" description="Villa Rosengarten in winter: an icy coastline, warm firelight and quiet on Fehmarn outside the season.">
+  <section class="apt-hero">
+    <Image
+      class="apt-hero-img"
+      src={heroWinter}
+      alt="Villa Rosengarten in winter, lit up in the snow"
+      widths={[800, 1600, 2200]}
+      sizes="100vw"
+      loading="eager"
+    />
+    <div class="apt-hero-content">
+      <p class="eyebrow">Villa Rosengarten</p>
+      <h1>The winter villa</h1>
+      <p class="apt-hero-sub">When Fehmarn falls quiet – fireside evenings, stormy air and silent beaches.</p>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="apt-section">
+      <ul class="feature-list apt-features">
+        {features.map((f) => <li>{f}</li>)}
+      </ul>
+
+      <p>
+        In winter, Fehmarn shows a completely different, equally fascinating
+        side: icy stones along the shore, clear air, a low sun over the Baltic
+        Sea, and beaches where you’re often alone for as far as the eye can
+        see. If you like wind and weather, you’ll find a stillness here that’s
+        rare in summer – ideal for long walks with the dog, storm-watching
+        from the cliffs, or simply a few days of deliberately doing nothing.
+      </p>
+      <p>
+        Inside the villa itself, things get especially cosy. A wood stove,
+        warm wall heating and thick blankets keep you comfortable while the
+        wind blows around the house outside. After a walk along the icy
+        coast, the villa’s own sauna is just the thing to warm back up – and
+        in the evening, the fireplace invites you to linger.
+      </p>
+      <p>
+        The villa is also perfectly suited to longer stays outside the main
+        season: professional high-speed WiFi makes it an ideal retreat for
+        remote work, while Fehmarn unfolds its winter stillness right outside
+        the door. And when snow falls in the evening and the villa glows in
+        the warm light of the garden lighting, an atmosphere emerges that
+        many of our guests particularly treasure.
+      </p>
+    </div>
+  </section>
+
+  {galleryImages.length > 0 && (
+    <section class="wrap">
+      <h2 class="section-title">Winter impressions</h2>
+      <PhotoGallery images={galleryImages} name="Wintervilla" layout="masonry" />
+    </section>
+  )}
+
+  <section class="wrap">
+    <div class="booking-cta">
+      <a class="btn btn-lg" href="/en/ferienwohnungen/">View apartments</a>
+      <a class="btn btn-ghost-dark" href="/en/kontakt/">Personal inquiry</a>
+    </div>
+  </section>
+</Layout>

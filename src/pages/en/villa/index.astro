@@ -1,0 +1,109 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import PhotoGallery from '../../../components/PhotoGallery.astro';
+import { Image } from 'astro:assets';
+import { getVillaImages } from '../../../lib/galleries.js';
+import heroVilla from '../../../images/villa-hero.jpg';
+
+const hero = heroVilla;
+const galleryImages = getVillaImages();
+---
+
+<Layout title="The Villa" description="About Villa Rosengarten and its history – built in 1920, lovingly restored since 2015.">
+  <section class="wrap" style="padding-top:3rem;">
+    <p class="eyebrow">Villa Rosengarten</p>
+    <h1>Our story</h1>
+    <Image
+      class="villa-hero"
+      src={hero}
+      alt="Villa Rosengarten in summer"
+      widths={[600, 1000, 1600]}
+      sizes="(max-width: 1100px) 100vw, 1040px"
+      loading="eager"
+    />
+
+    <div class="legal-content">
+      <p>
+        Fehmarn was, for us, always more than just a travel destination. It was
+        the place we kept returning to – to kitesurf, for long walks with our
+        dogs along the sea, or simply to enjoy the calm, the wind and the
+        island’s special atmosphere.
+      </p>
+      <p>
+        On one of these visits, we discovered Villa Rosengarten. From the first
+        glance, it was clear: this house has a soul. The architecture, the old
+        trees and the charm of the property captivated us immediately. When the
+        opportunity to take over the villa arose in 2015, we didn’t have to
+        think twice.
+      </p>
+      <p>
+        With a great deal of passion, attention to detail and respect for the
+        house’s history, we extensively restored and modernised the villa,
+        built in 1920. Our goal was to preserve its original character while
+        creating a place where our guests feel completely at home – stylish,
+        comfortable and with all the amenities that make for a relaxed stay.
+      </p>
+      <p>
+        Today, Villa Rosengarten combines historic elegance with modern living
+        comfort. Professional high-speed WiFi makes it just as much the
+        perfect retreat for remote work as for a longer holiday. Those who
+        work in the morning with a view of the greenery and spend their
+        evenings at the beach or on the water experience a very special
+        balance between work and relaxation.
+      </p>
+      <p>
+        Fehmarn offers exceptional opportunities all year round: endless
+        beaches, nature, watersports, cycling routes and the vastness of the
+        Baltic Sea. Whether you’re a kitesurfer, cyclist, dog owner, nature
+        lover, or simply someone looking to escape everyday life for a while –
+        everyone finds their own favourite spot here.
+      </p>
+      <p>
+        Our small sauna and the fitness area in the old barn are available to
+        our guests in the low season and winter, by individual appointment and
+        for a surcharge, and invite you to do something good for body and mind.
+        Of course, four-legged family members are warmly welcome too – because
+        we know from our own experience that a holiday is only complete when
+        man’s best friend can come along.
+      </p>
+      <p>
+        We look forward to welcoming you to Villa Rosengarten and sharing our
+        enthusiasm for this special place with you.
+      </p>
+    </div>
+  </section>
+
+  {galleryImages.length > 0 && (
+    <section class="wrap">
+      <h2 class="section-title">Impressions of the villa</h2>
+      <PhotoGallery images={galleryImages} name="Villa Rosengarten" layout="masonry" />
+    </section>
+  )}
+
+  <section class="wrap">
+    <div class="legal-content">
+      <h2>The apartments at a glance</h2>
+      <ul>
+        <li><a href="/en/zwergenfee/"><strong>Zwergenfee</strong></a> – in the annex</li>
+        <li><a href="/en/loft/"><strong>Loft</strong></a> – on the garden level</li>
+        <li><a href="/en/romantika/"><strong>Romantika</strong></a> – on the raised ground floor of the main house</li>
+        <li><a href="/en/sommerwind/"><strong>Sommerwind</strong></a> – with roof terrace in the main house</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="related-grid">
+      <a class="related-card" href="/en/wintervilla/">
+        <h3>The villa in winter</h3>
+        <p>Frosty coastlines, fireside evenings and quiet walks – Fehmarn has its charm outside summer too.</p>
+        <span class="related-cta">Discover the winter villa →</span>
+      </a>
+      <a class="related-card" href="/en/sauna-fitness/">
+        <h3>Sauna &amp; fitness</h3>
+        <p>Our own wellness area for guests – by individual appointment.</p>
+        <span class="related-cta">Learn more →</span>
+      </a>
+    </div>
+  </section>
+</Layout>

@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /meine-buchung.php
+Disallow: /webhook-smoobu.php
 
 Sitemap: https://rosengarten.casa/sitemap-index.xml

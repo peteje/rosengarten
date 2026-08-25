@@ -10,6 +10,12 @@
 // (dort kam es zu 503-Fehlern) durch eine direkte, zuverlässige Einbettung
 // über login.smoobu.com – CSP in public/.htaccess erlaubt diese Domain
 // bereits (script-src, frame-src, connect-src, style-src, font-src).
+//
+// Kein /en/-Pfad hier: das eigentliche Buchungsformular (booking.smoobu.com)
+// ignoriert den /de//en/-Teil dieser iframe-URL komplett und schaltet
+// stattdessen automatisch nach der Browsersprache des Gasts um (laut
+// Smoobu-Support-Doku) -- ein lang-Parameter hier würde nur Komplexität
+// vortäuschen, die nichts bewirkt.
 interface Props {
   apartmentId?: string;
 }

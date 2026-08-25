@@ -719,6 +719,27 @@ form.contact-form .field-error {
 .nav-cta:hover {
   background: var(--color-green-dark);
 }
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.lang-switch a {
+  text-decoration: none;
+  color: inherit;
+  opacity: 0.55;
+}
+.lang-switch a:hover,
+.lang-switch a.is-active {
+  opacity: 1;
+  color: var(--color-rose);
+}
+.lang-switch span {
+  opacity: 0.4;
+}
 
 /* --- HERO (full-bleed) --- */
 .hero-full {

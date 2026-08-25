@@ -1,18 +1,25 @@
 ---
+import { t, localePrefix } from '../i18n/ui.js';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+
+const lang = Astro.currentLocale === 'en' ? 'en' : 'de';
+const nav = t(lang).nav;
+const p = localePrefix(lang);
+
 const navItems = [
-  { href: '/', label: 'Startseite' },
-  { href: '/villa/', label: 'Villa' },
-  { href: '/ferienwohnungen/', label: 'Ferienwohnungen' },
-  { href: '/wintervilla/', label: 'Wintervilla' },
-  { href: '/sauna-fitness/', label: 'Sauna & Fitness' },
-  { href: '/kontakt/', label: 'Kontakt' },
+  { href: `${p}/`, label: nav.home },
+  { href: `${p}/villa/`, label: nav.villa },
+  { href: `${p}/ferienwohnungen/`, label: nav.apartments },
+  { href: `${p}/wintervilla/`, label: nav.winter },
+  { href: `${p}/sauna-fitness/`, label: nav.sauna },
+  { href: `${p}/kontakt/`, label: nav.contact },
 ];
 ---
 
 <header class="site-header" data-header>
   <div class="wrap">
     <div class="brand">
-      <a class="logo" href="/"><span class="logo-name">Villa Rosengarten</span></a>
+      <a class="logo" href={`${p}/`}><span class="logo-name">Villa Rosengarten</span></a>
       <a class="logo-by" href="https://www.ventovinte.com" target="_blank" rel="noopener">by VentoVinte</a>
     </div>
     <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="main-nav">
@@ -23,7 +30,8 @@ const navItems = [
         {navItems.map((item) => (
           <li><a href={item.href}>{item.label}</a></li>
         ))}
-        <li><a class="nav-cta" href="/buchen/">Jetzt buchen</a></li>
+        <li><a class="nav-cta" href={`${p}/buchen/`}>{nav.bookNow}</a></li>
+        <li><LanguageSwitcher /></li>
       </ul>
     </nav>
   </div>
