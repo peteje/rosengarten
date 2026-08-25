@@ -62,18 +62,10 @@ function smoobu_api_request(string $method, string $path, string $query, string 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
     }
     $response = curl_exec($ch);
-    $curlError = curl_error($ch);
     $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     $decoded = $response !== false ? json_decode($response, true) : null;
-    // TEMPORÄR fürs Debugging (siehe webhook-smoobu.php) -- $GLOBALS statt
-    // Rückgabewert, damit smoobu_get_reservation() seine Signatur behält.
-    $GLOBALS['smoobu_last_debug'] = [
-        'status' => $status,
-        'curlError' => $curlError,
-        'rawSnippet' => $response !== false ? substr($response, 0, 300) : null,
-    ];
     return [$status, $decoded];
 }
 
