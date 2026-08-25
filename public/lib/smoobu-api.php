@@ -13,16 +13,28 @@
 
 define('SMOOBU_API_HOST', 'https://login.smoobu.com');
 
+// trim() gegen unsichtbare Leerzeichen/Zeilenumbrüche, die beim Einfügen der
+// GitHub-Secrets leicht mit reinrutschen und die HMAC-Signatur sonst still
+// verfälschen (Smoobu antwortet dann mit einem sauberen 401, ohne Hinweis
+// auf die eigentliche Ursache).
+function smoobu_api_key(): string {
+    return trim(SMOOBU_API_KEY);
+}
+function smoobu_api_secret(): string {
+    return trim(SMOOBU_API_SECRET);
+}
+
 function smoobu_hmac_headers(string $method, string $path, string $query, string $body): array {
     $timestamp = gmdate('Y-m-d\TH:i:s\Z');
     $nonce = bin2hex(random_bytes(16));
     $bodyHash = hash('sha256', $body);
+    $apiKey = smoobu_api_key();
 
-    $canonical = implode("\n", [$method, $path, $query, $timestamp, $nonce, $bodyHash, SMOOBU_API_KEY]);
-    $signature = base64_encode(hash_hmac('sha256', $canonical, SMOOBU_API_SECRET, true));
+    $canonical = implode("\n", [$method, $path, $query, $timestamp, $nonce, $bodyHash, $apiKey]);
+    $signature = base64_encode(hash_hmac('sha256', $canonical, smoobu_api_secret(), true));
 
     return [
-        'X-API-Key: ' . SMOOBU_API_KEY,
+        'X-API-Key: ' . $apiKey,
         'X-Timestamp: ' . $timestamp,
         'X-Nonce: ' . $nonce,
         'X-Signature: ' . $signature,

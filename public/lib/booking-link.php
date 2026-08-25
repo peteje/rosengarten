@@ -10,7 +10,9 @@
  */
 
 function booking_link_token(int $reservationId): string {
-    $raw = hash_hmac('sha256', (string) $reservationId, BOOKING_LINK_SECRET, true);
+    // trim() aus demselben Grund wie in smoobu-api.php -- Copy-Paste in
+    // GitHub Secrets kann unsichtbare Leerzeichen/Zeilenumbrüche einschleusen.
+    $raw = hash_hmac('sha256', (string) $reservationId, trim(BOOKING_LINK_SECRET), true);
     $b64 = rtrim(strtr(base64_encode($raw), '+/', '-_'), '=');
     return substr($b64, 0, 22);
 }
