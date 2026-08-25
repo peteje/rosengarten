@@ -105,7 +105,10 @@ $reservation = smoobu_get_reservation($reservationId);
 if ($reservation === null) {
     webhook_log("webhook-smoobu: Reservierung {$reservationId} konnte nicht per API geladen werden.");
     http_response_code(502);
-    echo json_encode(['error' => 'reservation lookup failed']);
+    // TEMPORÄR: Debug-Details in der Antwort, bis das Problem gefunden ist
+    // (siehe smoobu-api.php $GLOBALS['smoobu_last_debug']) -- danach wieder
+    // auf die schlichte Fehlermeldung zurückstellen.
+    echo json_encode(['error' => 'reservation lookup failed', 'debug' => $GLOBALS['smoobu_last_debug'] ?? null]);
     exit;
 }
 
