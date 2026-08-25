@@ -1,0 +1,146 @@
+name: Nightly Rebuild (aktuelle Smoobu-Preise)
+
+# Baut die Seite jede Nacht neu -- die "ab"-Preise (src/lib/prices.js) werden
+# aus der Smoobu-API gezogen und in die statischen Seiten eingebacken, damit
+# sie nie älter als ~24h sind, ohne dass "villa.sh deploy" von Hand
+# angestoßen werden muss.
+#
+# dist/ wird nur committet, wenn sich beim Bauen wirklich etwas geändert hat
+# (z.B. weil das 365-Tage-Preisfenster einen Tag weiterrutscht oder sich
+# Verfügbarkeit/Preise geändert haben) -- danach läuft exakt derselbe
+# diff-basierte SFTP-Upload wie beim manuellen Deploy (siehe deploy.yml),
+# damit weiterhin nur tatsächlich geänderte Dateien übertragen werden.
+#
+# Zusätzliche Secrets ggü. deploy.yml (alle optional -- ohne sie baut Astro
+# einfach mit den manuellen Fallback-Preisen/ohne Google-Bewertungen, der
+# Build schlägt nie fehl):
+#   SMOOBU_API_KEY / SMOOBU_API_SECRET      -> Preisabruf beim Bauen
+#   GOOGLE_PLACES_API_KEY / GOOGLE_PLACE_ID -> Google-Bewertungen (reviews.js)
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 03:00 UTC = 04:00/05:00 MEZ/MESZ
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ionos
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    name: Neu bauen, committen (falls geändert) und deployen
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code auschecken
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # volle Historie + Tags nötig für den Diff gegen "deployed"
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Seite bauen (mit aktuellen Smoobu-Preisen)
+        env:
+          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
+          SMOOBU_API_SECRET: ${{ secrets.SMOOBU_API_SECRET }}
+          GOOGLE_PLACES_API_KEY: ${{ secrets.GOOGLE_PLACES_API_KEY }}
+          GOOGLE_PLACE_ID: ${{ secrets.GOOGLE_PLACE_ID }}
+          TZ: Europe/Berlin
+        run: npm run build
+
+      - name: dist/ committen, falls sich etwas geändert hat
+        id: commit
+        run: |
+          git config user.name "villa-nightly-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add dist/
+          if git diff --cached --quiet; then
+            echo "Keine Änderungen am Build -- nichts zu committen."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git commit -m "Nightly Rebuild: aktuelle Smoobu-Preise"
+            git push origin main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: lftp installieren
+        if: steps.commit.outputs.changed == 'true'
+        run: sudo apt-get update && sudo apt-get install -y lftp
+
+      - name: SMTP-Konfiguration erzeugen (aus Secrets, landet nie im Git-Repo)
+        if: steps.commit.outputs.changed == 'true'
+        id: smtp
+        env:
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          TURNSTILE_SECRET_KEY: ${{ secrets.TURNSTILE_SECRET_KEY }}
+          SMOOBU_API_KEY: ${{ secrets.SMOOBU_API_KEY }}
+          SMOOBU_API_SECRET: ${{ secrets.SMOOBU_API_SECRET }}
+          BOOKING_LINK_SECRET: ${{ secrets.BOOKING_LINK_SECRET }}
+          SMOOBU_WEBHOOK_TOKEN: ${{ secrets.SMOOBU_WEBHOOK_TOKEN }}
+        run: |
+          RESULT=$(python3 .github/scripts/write_smtp_config.py)
+          echo "$RESULT"
+          echo "result=$RESULT" >> "$GITHUB_OUTPUT"
+
+      - name: SMTP-Konfiguration auf Webspace hochladen (SFTP)
+        if: steps.commit.outputs.changed == 'true' && steps.smtp.outputs.result == 'WRITTEN'
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          SSL_PORT: ${{ secrets.SSL_PORT }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+        run: |
+          export LFTP_PASSWORD="$FTP_PASSWORD"
+          lftp -u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; put /tmp/smtp-config.php -o \"$FTP_SERVER_DIR/smtp-config.php\"; bye"
+
+      - name: Deploy-Skript erzeugen (Diff gegen letzten erfolgreichen Deploy)
+        if: steps.commit.outputs.changed == 'true'
+        id: plan
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          SSL_PORT: ${{ secrets.SSL_PORT }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+        run: |
+          RESULT=$(python3 .github/scripts/build_deploy_script.py "$FTP_SERVER_DIR")
+          echo "Ergebnis: $RESULT"
+          echo "result=$RESULT" >> "$GITHUB_OUTPUT"
+
+      - name: Auf IONOS Webspace synchronisieren (SFTP)
+        if: steps.commit.outputs.changed == 'true' && !startsWith(steps.plan.outputs.result, 'NOTHING_TO_DO')
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          SSL_PORT: ${{ secrets.SSL_PORT }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          PLAN_RESULT: ${{ steps.plan.outputs.result }}
+        run: |
+          export LFTP_PASSWORD="$FTP_PASSWORD"
+
+          if [[ "$PLAN_RESULT" == SCRIPT_READY* ]]; then
+            echo "Übertrage nur geänderte Dateien laut Git-Diff..."
+            lftp -f /tmp/lftp-deploy.txt
+          else
+            BASE_ARGS=(-u "$FTP_USERNAME" --env-password -p "${SSL_PORT:-22}" "sftp://$FTP_SERVER")
+            echo "Vollständiger Mirror ($PLAN_RESULT)..."
+            lftp "${BASE_ARGS[@]}" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' --exclude '^smtp-config\.php$' --exclude '^mail-error\.log$' --exclude '^booking-emails-sent/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
+          fi
+
+      - name: Tag "deployed" auf diesen Commit setzen
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          git tag -f deployed HEAD
+          git push origin refs/tags/deployed --force

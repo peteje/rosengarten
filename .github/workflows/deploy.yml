@@ -135,11 +135,13 @@ jobs:
             # diesen Ausschluss versucht --delete ihn bei jedem Deploy erneut
             # zu entfernen und scheitert dann mit "Permission denied".
             #
-            # --exclude '^smtp-config\.php$' / '^mail-error\.log$': beide
-            # leben nur auf dem Webspace (nie im Git-Repo/dist/), --delete
-            # würde sie sonst bei jedem vollständigen Mirror entfernen.
+            # --exclude '^smtp-config\.php$' / '^mail-error\.log$' /
+            # '^booking-emails-sent/': leben nur auf dem Webspace (nie im
+            # Git-Repo/dist/), --delete würde sie sonst bei jedem
+            # vollständigen Mirror entfernen (Letzteres sind die
+            # Duplikat-Schutz-Marker von webhook-smoobu.php).
             echo "Vollständiger Mirror ($PLAN_RESULT)..."
-            lftp "${BASE_ARGS[@]}" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' --exclude '^smtp-config\.php$' --exclude '^mail-error\.log$' ./dist/ \"$FTP_SERVER_DIR\"; bye"
+            lftp "${BASE_ARGS[@]}" -e "set sftp:auto-confirm yes; set net:timeout 20; set net:max-retries 2; mirror -R --delete --verbose --exclude '^rosengarten/' --exclude '^smtp-config\.php$' --exclude '^mail-error\.log$' --exclude '^booking-emails-sent/' ./dist/ \"$FTP_SERVER_DIR\"; bye"
           fi
 
       - name: Tag "deployed" auf diesen Commit setzen
